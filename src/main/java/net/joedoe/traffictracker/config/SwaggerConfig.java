@@ -1,5 +1,6 @@
 package net.joedoe.traffictracker.config;
 
+import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -18,10 +19,12 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
+        //noinspection Guava
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
+                .paths(Predicates.not(PathSelectors.regex("/error.*")))
                 .build()
                 .pathMapping("/")
                 .apiInfo(metaData());
