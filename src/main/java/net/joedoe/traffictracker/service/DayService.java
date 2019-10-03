@@ -55,17 +55,17 @@ public class DayService {
     }
 
     public List<Day> getWeek(LocalDate date) {
-        return repository.getDaysByDateBetween(date, date.plusWeeks(1))
+        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     public List<Day> getMonth(LocalDate date) {
-        return repository.getDaysByDateBetween(date, date.plusMonths(1))
+        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     public List<Day> getYear(LocalDate date) {
-        return repository.getDaysByDateBetween(date, date.plusYears(1))
+        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1))
                 .orElseThrow(ResourceNotFoundException::new);
     }
 }

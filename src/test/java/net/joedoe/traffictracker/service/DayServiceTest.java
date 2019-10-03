@@ -89,7 +89,7 @@ public class DayServiceTest {
     public void getWeek() {
         LocalDate date = this.date.with(DayOfWeek.MONDAY);
 
-        when(repository.getDaysByDateBetween(date.minusDays(1), date.plusWeeks(1))).thenReturn(Optional.of(days));
+        when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1))).thenReturn(Optional.of(days));
         List<Day> daysOfWeek = service.getWeek(date);
 
         assertEquals(days.size(), daysOfWeek.size());
@@ -99,7 +99,7 @@ public class DayServiceTest {
     public void getMonth() {
         LocalDate date = this.date.withDayOfMonth(1);
 
-        when(repository.getDaysByDateBetween(date.minusDays(1), date.plusMonths(1))).thenReturn(Optional.of(days));
+        when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1))).thenReturn(Optional.of(days));
         List<Day> daysOfMonth = service.getMonth(date);
 
         assertEquals(days.size(), daysOfMonth.size());
@@ -109,7 +109,7 @@ public class DayServiceTest {
     public void getYear() {
         LocalDate date = this.date.withDayOfMonth(1).withMonth(1);
 
-        when(repository.getDaysByDateBetween(date.minusDays(1), date.plusYears(1))).thenReturn(Optional.of(days));
+        when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1))).thenReturn(Optional.of(days));
         List<Day> daysOfYear = service.getYear(date);
 
         assertEquals(days.size(), daysOfYear.size());

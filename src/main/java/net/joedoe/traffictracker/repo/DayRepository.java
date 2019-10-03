@@ -17,5 +17,5 @@ public interface DayRepository extends JpaRepository<Day, Long> {
 
     Optional<Day> getDayByDate(LocalDate date);
 
-    Optional<List<Day>> getDaysByDateBetween(LocalDate dateBefore, LocalDate dateAfter);
+    Optional<List<Day>> findAllByDateGreaterThanEqualAndDateLessThan(LocalDate start, LocalDate end);
 }
