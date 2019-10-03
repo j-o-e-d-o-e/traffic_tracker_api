@@ -59,11 +59,11 @@ public class DayMapper extends ResourceAssemblerSupport<Day, DayDto> {
 
     private DayDto dayToDayDto(Day day) {
         int avgPlanes;
-        int absPlanesDay = day.getTotal() - day.getPlanes0();
+        int absPlanesDay = day.getTotal() - day.getPlanes23() - day.getPlanes0();
         if (LocalDate.now().isEqual(day.getDate())) {
             avgPlanes = absPlanesDay / (LocalDateTime.now().getHour() - 6);
         } else {
-            avgPlanes = absPlanesDay / 18;
+            avgPlanes = absPlanesDay / 17;
         }
         return new DayDto(day.getDate(), day.getDate().getDayOfWeek().name(), day.getTotal(), avgPlanes,
                 day.getAvgAltitude(), day.getAvgSpeed(), day.getWindSpeed(), day.getHoursPlane(), day.getHoursWind());
