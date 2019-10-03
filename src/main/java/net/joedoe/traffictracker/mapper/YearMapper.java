@@ -12,6 +12,7 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -68,10 +69,9 @@ public class YearMapper extends ResourceAssemblerSupport<List<Day>, YearDto> {
                 absDaysWithLessThanThirtyPlanes += 1;
             months[day.getDate().getMonth().getValue() - 1] += day.getTotal();
         }
-        int avgPlanes = 0;
+        int avgPlanes = total / (int) Arrays.stream(months).filter(i -> i != 0).count();
         float daysWithLessThanThirtyPlanes = 0f;
         if (days.size() != 0) {
-            avgPlanes = total / days.size();
             float percentage = (absDaysWithLessThanThirtyPlanes / (float) days.size()) * 100;
             daysWithLessThanThirtyPlanes = Math.round(percentage * 100) / 100f;
         }
