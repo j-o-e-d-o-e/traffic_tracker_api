@@ -8,6 +8,6 @@ Rest api for tracking planes in a specified area including swagger and hateoas. 
 
 ![client](https://user-images.githubusercontent.com/26798159/65524223-bd890600-deed-11e9-8b39-dc82cec949c2.png)
 
-## Python scripts
+## Scripts
 
 Alternatively to angular client, python scripts are located in directory `py`.
