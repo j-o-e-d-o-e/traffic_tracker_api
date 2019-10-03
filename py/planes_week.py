@@ -48,7 +48,7 @@ def main():
     if datetime.now().date() >= date.date() + timedelta(days=DAYS):
         plt.plot(x_axis, [avg_planes] * DAYS, label="average", linestyle="--", color="orange")
     else:
-        days_with_data = datetime.now().date().day - date.date().day + 1
+        days_with_data = (datetime.now().date() - date.date() + timedelta(days=1)).days
         plt.plot(x_axis, [avg_planes] * days_with_data + [None] * (DAYS - days_with_data),
                  label="average", linestyle="--", color="orange")
     plt.legend()
