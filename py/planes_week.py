@@ -6,6 +6,7 @@ import sys
 URL = 'http://traffic-tracker.herokuapp.com/planes/week'
 DAYS = 7
 date = None
+now = None
 date_string = ''
 
 total = 0
@@ -45,10 +46,10 @@ def main():
         plt.text(i - 0.05, v + 2, "{:,}".format(v))
 
     plt.bar(x_axis, weekdays, label="absolute")
-    if datetime.now().date() >= date.date() + timedelta(days=DAYS):
+    if now.date() >= date.date() + timedelta(days=DAYS):
         plt.plot(x_axis, [avg_planes] * DAYS, label="average", linestyle="--", color="orange")
     else:
-        days_with_data = (datetime.now().date() - date.date() + timedelta(days=1)).days
+        days_with_data = (now.date() - date.date() + timedelta(days=1)).days
         plt.plot(x_axis, [avg_planes] * days_with_data + [None] * (DAYS - days_with_data),
                  label="average", linestyle="--", color="orange")
     plt.legend()
@@ -56,13 +57,14 @@ def main():
 
 
 def fetch():
-    global URL, date, total, avg_planes, planes_23, planes_0, avg_altitude, avg_speed, weekdays
+    global URL, date, total, avg_planes, planes_23, planes_0, avg_altitude, avg_speed, weekdays, now
     if date_string != '':
         URL = URL + '/' + date_string
     response = requests.get(URL).json()
     print(response)
 
     date = datetime.strptime(response['start_date'], '%Y-%m-%d')
+    now = datetime.strptime(response['now'], '%Y-%m-%dT%H:%M:%S.%f')
 
     total = int(response['total'])
     avg_planes = int(response['avg_planes'])

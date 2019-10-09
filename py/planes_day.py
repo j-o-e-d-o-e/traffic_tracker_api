@@ -77,7 +77,7 @@ def fetch():
 
     wind_speed = response['wind_speed']
 
-    now = datetime.now()
+    now = datetime.strptime(response['now'], '%Y-%m-%dT%H:%M:%S.%f')
     if now.date() == date.date():
         current_data(now, response)
     else:

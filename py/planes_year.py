@@ -6,6 +6,7 @@ import sys
 URL = 'http://traffic-tracker.herokuapp.com/planes/year'
 MONTHS = 12
 date = None
+now = None
 date_string = ''
 
 total = 0
@@ -44,13 +45,13 @@ def main():
         plt.text(i - 0.2, v + 2, v)
 
     plt.bar(x_axis, months, label="absolute")
-    if datetime.now().date() >= date.date() + timedelta(days=365):
+    if now.date() >= date.date() + timedelta(days=365):
         plt.plot(x_axis, [avg_planes] * MONTHS, label="average", linestyle="--", color="orange")
     else:
         months_with_data = 0
         for i, months_with_data in enumerate(months[:-1]):
             if months_with_data != 0:
-                months_with_data = i + 1
+                months_with_data = i + 2
                 break
         # noinspection PyTypeChecker
         plt.plot(x_axis, [avg_planes] * months_with_data + [None] * (MONTHS - months_with_data),
@@ -61,13 +62,15 @@ def main():
 
 def fetch():
     global URL, date, total, avg_planes, planes_23, planes_0, avg_altitude, avg_speed, \
-        days_with_less_than_thirty_planes, months
+        days_with_less_than_thirty_planes, months, now
     if date_string != '':
         URL = URL + '/' + date_string
     response = requests.get(URL).json()
     print(response)
 
     date = datetime.strptime(response['start_date'], '%Y-%m-%d')
+    now = datetime.strptime(response['now'], '%Y-%m-%dT%H:%M:%S.%f')
+
     total = int(response['total'])
     avg_planes = int(response['avg_planes'])
     planes_23 = int(response['planes_23'])
