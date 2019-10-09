@@ -13,6 +13,7 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -84,7 +85,7 @@ public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
             avgAltitude = absAltitude / total;
             avgSpeed = absSpeed / total;
         }
-        return new MonthDto(date, date.plusDays(daysOfMonth - 1), total, avgPlanes, planes23, planes0,
-                avgAltitude, avgSpeed, daysWithLessThanThirtyPlanes, monthDays);
+        return new MonthDto(date, date.plusDays(daysOfMonth - 1), LocalDateTime.now(),
+                total, avgPlanes, planes23, planes0, avgAltitude, avgSpeed, daysWithLessThanThirtyPlanes, monthDays);
     }
 }

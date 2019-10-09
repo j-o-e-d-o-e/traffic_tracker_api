@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -77,6 +78,7 @@ public class WeekMapper extends ResourceAssemblerSupport<List<Day>, WeekDto> {
             avgAltitude = absAltitude / total;
             avgSpeed = absSpeed / total;
         }
-        return new WeekDto(date, date.plusDays(6), total, avgPlanes, planes23, planes0, avgAltitude, avgSpeed, weekdays);
+        return new WeekDto(date, date.plusDays(6), LocalDateTime.now(),
+                total, avgPlanes, planes23, planes0, avgAltitude, avgSpeed, weekdays);
     }
 }

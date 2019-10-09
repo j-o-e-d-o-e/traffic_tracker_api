@@ -12,6 +12,7 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class YearMapper extends ResourceAssemblerSupport<List<Day>, YearDto> {
             avgAltitude = absAltitude / total;
             avgSpeed = absSpeed / total;
         }
-        return new YearDto(date, date.plusYears(1).minusDays(1), total, avgPlanes, planes23, planes0,
-                avgAltitude, avgSpeed, daysWithLessThanThirtyPlanes, months);
+        return new YearDto(date, date.plusYears(1).minusDays(1), LocalDateTime.now(),
+                total, avgPlanes, planes23, planes0, avgAltitude, avgSpeed, daysWithLessThanThirtyPlanes, months);
     }
 }

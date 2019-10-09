@@ -6,12 +6,14 @@ import lombok.EqualsAndHashCode;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
 public class DayDto extends ResourceSupport {
     private LocalDate date;
+    private LocalDateTime now;
     private String weekday;
     private int total;
     private int avg_planes;

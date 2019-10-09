@@ -65,7 +65,9 @@ public class DayMapper extends ResourceAssemblerSupport<Day, DayDto> {
         } else {
             avgPlanes = absPlanesDay / 17;
         }
-        return new DayDto(day.getDate(), day.getDate().getDayOfWeek().name(), day.getTotal(), avgPlanes,
-                day.getAvgAltitude(), day.getAvgSpeed(), day.getWindSpeed(), day.getHoursPlane(), day.getHoursWind());
+        return new DayDto(day.getDate(), LocalDateTime.now(), day.getDate().getDayOfWeek().name(),
+                day.getTotal(), avgPlanes, day.getAvgAltitude(), day.getAvgSpeed(),
+                day.getWindSpeed(), day.getHoursPlane(), day.getHoursWind()
+        );
     }
 }
