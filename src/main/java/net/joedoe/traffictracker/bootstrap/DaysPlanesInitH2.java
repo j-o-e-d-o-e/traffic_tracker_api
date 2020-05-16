@@ -3,6 +3,7 @@ package net.joedoe.traffictracker.bootstrap;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.model.Plane;
+import net.joedoe.traffictracker.model.Wind;
 import net.joedoe.traffictracker.repo.DayRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -29,6 +30,7 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
         Day day = repository.getDayByDate(LocalDate.now()).orElse(null);
         if (day != null) {
             loadPlanes(day, LocalDateTime.now());
+            loadWinds(day, LocalDateTime.now());
             repository.save(day);
         }
         int[] days = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 30, 31, 32, 365, 366, 367};
@@ -36,6 +38,7 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
             day = new Day();
             day.setDate(LocalDate.now().minusDays(i));
             loadPlanes(day, LocalDateTime.now().minusDays(i));
+            loadWinds(day, LocalDateTime.now().minusDays(i));
             repository.save(day);
         }
     }
@@ -61,5 +64,31 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
         plane3.setIcao("40083b");
         plane3.setSpeed(362);
         day.addPlane(plane3);
+    }
+
+    private void loadWinds(Day day, LocalDateTime dateTime) {
+        Wind wind1 = new Wind();
+        wind1.setDate(dateTime);
+        wind1.setDeg(280);
+        wind1.setSpeed(12f);
+        day.addWind(wind1);
+
+        Wind wind2 = new Wind();
+        wind2.setDate(dateTime.minusHours(1));
+        wind2.setDeg(320);
+        wind2.setSpeed(12f);
+        day.addWind(wind2);
+
+        Wind wind3 = new Wind();
+        wind3.setDate(dateTime.plusHours(1));
+        wind3.setDeg(10);
+        wind3.setSpeed(12f);
+        day.addWind(wind3);
+
+        Wind wind4 = new Wind();
+        wind4.setDate(dateTime.plusHours(2));
+        wind4.setDeg(30);
+        wind4.setSpeed(12f);
+        day.addWind(wind4);
     }
 }

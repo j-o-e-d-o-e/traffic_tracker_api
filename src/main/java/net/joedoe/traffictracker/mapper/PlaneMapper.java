@@ -7,6 +7,8 @@ import net.joedoe.traffictracker.model.Plane;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -34,6 +36,7 @@ public class PlaneMapper extends ResourceAssemblerSupport<Plane, PlaneDto> {
     }
 
     private PlaneDto planeToPlaneDto(Plane plane) {
-        return new PlaneDto(plane.getIcao(), plane.getDate(), plane.getAltitude(), plane.getSpeed());
+        LocalDate date = LocalDate.from(plane.getDate());
+        return new PlaneDto(plane.getIcao(), plane.getDate(), date, plane.getAltitude(), plane.getSpeed());
     }
 }

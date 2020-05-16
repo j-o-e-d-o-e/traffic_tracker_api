@@ -3,6 +3,7 @@ package net.joedoe.traffictracker.controller;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.PlaneDto;
 import net.joedoe.traffictracker.mapper.PlaneMapper;
+import net.joedoe.traffictracker.model.MapData;
 import net.joedoe.traffictracker.service.PlaneService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -61,6 +62,11 @@ public class PlaneController {
             return null;
         }
         return pagedAssembler.toResource(service.getPlanesByIcao(icao, pageable), mapper);
+    }
+
+    @GetMapping("/current")
+    public MapData getCurrentPlanes() {
+        return service.getCurrentPlanes();
     }
 
     @GetMapping("/max/altitude")

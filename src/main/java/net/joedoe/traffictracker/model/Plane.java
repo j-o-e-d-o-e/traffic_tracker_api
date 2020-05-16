@@ -24,8 +24,8 @@ public class Plane {
     private int altitude;
     @Column
     private int speed;
+    @SuppressWarnings("JpaDataSourceORMInspection")
     @ToString.Exclude
-    //    @ManyToOne(fetch = FetchType.LAZY)
     @ManyToOne
     @JoinColumn(name = "day_id")
     private Day day;

@@ -30,13 +30,14 @@ public class Day {
     private int avgAltitude;
     @Column
     private int avgSpeed;
+    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column
     private int[] hoursPlane = new int[24];
-    //    @OneToMany(cascade = {CascadeType.MERGE}, mappedBy = "day", fetch = FetchType.EAGER)
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "day", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "day", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plane> planes = new ArrayList<>();
     @Column
     private float windSpeed;
+    @SuppressWarnings("JpaAttributeTypeInspection")
     @Column
     private int[] hoursWind = new int[24];
     @Column
@@ -55,15 +56,21 @@ public class Day {
     public void addPlane(Plane plane) {
         total += 1;
         lessThanThirtyPlanes = total < 30;
-        if (plane.getDate().getHour() == 23) {
+        if (plane.getDate().toLocalTime().isAfter(LocalTime.of(22, 57))) {
             planes23 += 1;
-        } else if (plane.getDate().toLocalTime().isBefore((LocalTime.of(5, 45)))) {
+        } else if (plane.getDate().toLocalTime().isBefore(LocalTime.of(5, 45))) {
             planes0 += 1;
         }
-        absAltitude += plane.getAltitude();
-        avgAltitude = absAltitude / total;
-        absSpeed += plane.getSpeed();
-        avgSpeed = absSpeed / total;
+        int altitude = plane.getAltitude();
+        if (altitude != 0) {
+            absAltitude += altitude;
+            avgAltitude = absAltitude / total;
+        }
+        int speed = plane.getSpeed();
+        if (speed != 0) {
+            absSpeed += speed;
+            avgSpeed = absSpeed / total;
+        }
         hoursPlane[plane.getDate().getHour()] += 1;
         plane.setDay(this);
         planes.add(plane);
@@ -74,5 +81,9 @@ public class Day {
         absWindSpeed += wind.getSpeed();
         windSpeed = Math.round(absWindSpeed / absWind * 100) / 100f;
         hoursWind[wind.getDate().getHour()] = wind.getDeg();
+    }
+
+    public void clearPlanes() {
+        this.planes.clear();
     }
 }

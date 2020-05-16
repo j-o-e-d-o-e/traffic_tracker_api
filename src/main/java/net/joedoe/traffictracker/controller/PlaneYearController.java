@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.mapper.YearMapper;
 import net.joedoe.traffictracker.service.DayService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,13 +29,12 @@ public class PlaneYearController {
         return mapper.toResource(service.getYear(date));
     }
 
-    @GetMapping("/{date}")
-    public YearDto getYearByDate(@PathVariable("date")
-                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        if (date == null) {
+    @GetMapping("/{year}")
+    public YearDto getYearByDate(@PathVariable("year") Integer year) {
+        if (year == null) {
             return null;
         }
-        date = date.withDayOfMonth(1).withMonth(1);
+        LocalDate date = LocalDate.of(year, 1, 1);
         return mapper.toResource(service.getYear(date));
     }
 }

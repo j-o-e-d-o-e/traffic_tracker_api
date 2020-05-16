@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.MonthDto;
 import net.joedoe.traffictracker.mapper.MonthMapper;
 import net.joedoe.traffictracker.service.DayService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,12 +28,12 @@ public class PlaneMonthController {
         return mapper.toResource(service.getMonth(LocalDate.now().withDayOfMonth(1)));
     }
 
-    @GetMapping("/{date}")
-    public MonthDto getMonthByDate(@PathVariable("date")
-                                   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        if (date == null) {
+    @GetMapping("/{year}/{month}")
+    public MonthDto getMonthByDate(@PathVariable("year") Integer year, @PathVariable("month") Integer month) {
+        if (year == null || month == null) {
             return null;
         }
-        return mapper.toResource(service.getMonth(date.withDayOfMonth(1)));
+        LocalDate date = LocalDate.of(year, month, 1);
+        return mapper.toResource(service.getMonth(date));
     }
 }

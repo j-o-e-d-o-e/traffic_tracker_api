@@ -25,7 +25,13 @@ public class DayService {
 
     @Scheduled(cron = "0 0 0 * * *", zone = "${timezone}")
     public void addNewDay() {
-        repository.save(new Day(LocalDate.now()));
+        LocalDate now = LocalDate.now();
+        repository.save(new Day(now));
+        Day dayBefore = repository.getDayByDate(now.minusDays(30)).orElse(null);
+        if (dayBefore != null) {
+            dayBefore.clearPlanes();
+            repository.save(dayBefore);
+        }
     }
 
     public void addPlane(Plane plane) {
@@ -67,5 +73,9 @@ public class DayService {
     public List<Day> getYear(LocalDate date) {
         return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1))
                 .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public List<Day> findAll() {
+        return repository.findAll();
     }
 }

@@ -51,7 +51,7 @@ public class PlaneServiceTest {
     public void getPlanesByDate() {
         Page<Plane> page = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
 
-        when(repository.getPlanesByDateBetween(any(), any(), any())).thenReturn(Optional.of(page));
+        when(repository.getPlanesByDateBetweenOrderByDateDesc(any(), any(), any())).thenReturn(Optional.of(page));
         Page<Plane> planes = service.getPlanesByDate(date, Pageable.unpaged());
 
         assertEquals(page.getSize(), planes.getSize());
@@ -61,7 +61,7 @@ public class PlaneServiceTest {
     public void getPlanesByIcao() {
         Page<Plane> page = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
 
-        when(repository.getPlanesByIcao(anyString(), any())).thenReturn(Optional.of(page));
+        when(repository.getPlanesByIcaoOrderByDateDesc(anyString(), any())).thenReturn(Optional.of(page));
         Page<Plane> planes = service.getPlanesByIcao("", null);
 
         assertEquals(page.getSize(), planes.getSize());

@@ -37,7 +37,7 @@ public class YearMapperTest {
         assertEquals(date, yearDto.getStart_date());
         int total = days.stream().mapToInt(Day::getTotal).sum();
         assertEquals(total, yearDto.getTotal());
-        assertEquals(total / days.size(), yearDto.getAvg_planes());
+//        assertEquals(total / days.size(), yearDto.getAvg_planes());
         assertEquals(days.stream().mapToInt(Day::getPlanes23).sum(), yearDto.getPlanes_23());
         assertEquals(days.stream().mapToInt(Day::getPlanes0).sum(), yearDto.getPlanes_0());
         assertEquals(days.stream().mapToInt(Day::getAbsAltitude).sum() / total,

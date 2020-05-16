@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -25,8 +26,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
     @Value("${startDate}")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-//    private LocalDate date;
-    private LocalDate date = LocalDate.of(2019, 9, 9);
+    private LocalDate date;
 
     public MonthMapper() {
         super(PlaneMonthController.class, MonthDto.class);
@@ -40,28 +40,38 @@ public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
         LocalDate date = days.get(0).getDate();
         MonthDto monthDto = daysToMonthDTO(date.withDayOfMonth(1), days);
         LocalDate startDate = monthDto.getStart_date();
-        LocalDate endDate = monthDto.getEnd_date();
 
         monthDto.add(linkTo(methodOn(PlaneMonthController.class)
-                .getMonthByDate(date)).withSelfRel());
-        if (startDate.minusMonths(1).plusDays(1).isAfter(this.date.withDayOfMonth(1))) {
+                .getMonthByDate(date.getYear(), date.getMonthValue())).withSelfRel());
+        if (monthDto.isPrev()) {
+            LocalDate tmp = startDate.minusMonths(1);
             monthDto.add(linkTo(methodOn(PlaneMonthController.class)
-                    .getMonthByDate(startDate.minusMonths(1))).withRel("prev_month"));
+                    .getMonthByDate(tmp.getYear(), tmp.getMonthValue())).withRel("prev_month"));
         }
-        if (endDate.isBefore(LocalDate.now())) {
+        if (monthDto.isNext()) {
+            LocalDate tmp = startDate.plusMonths(1);
             monthDto.add(linkTo(methodOn(PlaneMonthController.class)
-                    .getMonthByDate(startDate.plusMonths(1))).withRel("next_month"));
+                    .getMonthByDate(tmp.getYear(), tmp.getMonthValue())).withRel("next_month"));
         }
         monthDto.add(linkTo(methodOn(PlaneWeekController.class)
                 .getWeekByDate(date)).withRel("weeks"));
         monthDto.add(linkTo(methodOn(PlaneYearController.class)
-                .getYearByDate(date)).withRel("year"));
+                .getYearByDate(date.getYear())).withRel("year"));
         return monthDto;
     }
 
     private MonthDto daysToMonthDTO(LocalDate date, List<Day> days) {
         int total = 0, planes23 = 0, planes0 = 0, absAltitude = 0, absSpeed = 0, absDaysWithLessThanThirtyPlanes = 0;
         int daysOfMonth = date.getMonth().length(date.isLeapYear());
+        boolean prev = date.minusMonths(1).plusDays(1).isAfter(this.date.withDayOfMonth(1));
+        LocalDate endDate = date.plusDays(daysOfMonth - 1);
+        boolean next = endDate.isBefore(LocalDate.now());
+        LocalDate firstDayOfMonth;
+        if (date.getMonth() == this.date.getMonth()) {
+            firstDayOfMonth = this.date;
+        } else {
+            firstDayOfMonth = date;
+        }
         int[] monthDays = new int[daysOfMonth];
         for (Day day : days) {
             total += day.getTotal();
@@ -73,19 +83,27 @@ public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
                 absDaysWithLessThanThirtyPlanes += 1;
             monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
         }
-        int avgPlanes = 0;
-        float daysWithLessThanThirtyPlanes = 0f;
-        if (days.size() != 0) {
-            avgPlanes = total / days.size();
-            float percentage = (absDaysWithLessThanThirtyPlanes / (float) days.size()) * 100;
-            daysWithLessThanThirtyPlanes = Math.round(percentage * 100) / 100f;
+        Integer[] avgPlanes;
+        if (date.getMonth().equals(this.date.getMonth())) {
+            avgPlanes = new Integer[this.date.getMonth().length(this.date.isLeapYear())];
+            Arrays.fill(avgPlanes, 0, this.date.getDayOfMonth() - 1, null);
+            Arrays.fill(avgPlanes, this.date.getDayOfMonth() - 1, avgPlanes.length, total / days.size());
+        } else {
+            if (LocalDate.now().getMonth().equals(date.getMonth())) {
+                avgPlanes = new Integer[LocalDate.now().getDayOfMonth()];
+            } else {
+                avgPlanes = new Integer[date.getMonth().length(date.isLeapYear())];
+            }
+            Arrays.fill(avgPlanes, total / days.size());
         }
+        float percentage = (absDaysWithLessThanThirtyPlanes / (float) days.size()) * 100;
+        float daysWithLessThanThirtyPlanes = Math.round(percentage * 100) / 100f;
         int avgAltitude = 0, avgSpeed = 0;
         if (total != 0) {
             avgAltitude = absAltitude / total;
             avgSpeed = absSpeed / total;
         }
-        return new MonthDto(date, date.plusDays(daysOfMonth - 1), LocalDateTime.now(),
+        return new MonthDto(date, endDate, LocalDateTime.now(), date.getYear(), date.getMonthValue(), firstDayOfMonth, prev, next,
                 total, avgPlanes, planes23, planes0, avgAltitude, avgSpeed, daysWithLessThanThirtyPlanes, monthDays);
     }
 }

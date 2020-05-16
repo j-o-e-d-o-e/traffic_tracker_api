@@ -15,11 +15,14 @@ public class DayDto extends ResourceSupport {
     private LocalDate date;
     private LocalDateTime now;
     private String weekday;
+    private boolean prev;
+    private boolean next;
     private int total;
-    private int avg_planes;
+    private Integer[] avg_planes;
     private int avg_altitude;
     private int avg_speed;
+    private boolean less_than_thirty_planes;
     private float wind_speed;
     private int[] hours_plane;
-    private int[] hours_wind;
+    private Integer[] hours_wind;
 }

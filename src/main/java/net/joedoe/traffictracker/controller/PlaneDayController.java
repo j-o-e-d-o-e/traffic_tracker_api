@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -44,5 +45,10 @@ public class PlaneDayController {
             return null;
         }
         return mapper.toResource(service.getDayById(id));
+    }
+
+    @GetMapping("/all")
+    public List<DayDto> findAll() {
+        return mapper.toResources(service.findAll());
     }
 }

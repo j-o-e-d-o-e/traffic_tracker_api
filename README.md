@@ -1,10 +1,11 @@
 # traffic_tracker_api
 
 Rest api for tracking planes in a specified area including swagger and hateoas. Published on [heroku](https://traffic-tracker.herokuapp.com/swagger-ui.html).
+Includes [decision-tree-classifier](https://github.com/j-o-e-d-o-e/ml_planes) predicting whether planes are going to fly based on wind direction.
 
 ## Live client
 
-[Angular app](https://github.com/j-o-e-d-o-e/traffic-tracker-v1) published [here](https://j-o-e-d-o-e.github.io/traffic-tracker) (on GitHub Pages).
+[Angular app](https://github.com/j-o-e-d-o-e/ng_traffic_tracker) published [here](https://j-o-e-d-o-e.github.io/traffic-tracker/day) (on GitHub Pages).
 
 [![client](https://user-images.githubusercontent.com/26798159/65524223-bd890600-deed-11e9-8b39-dc82cec949c2.png)](https://j-o-e-d-o-e.github.io/traffic-tracker).
 

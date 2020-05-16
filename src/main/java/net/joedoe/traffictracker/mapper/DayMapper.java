@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -40,15 +41,15 @@ public class DayMapper extends ResourceAssemblerSupport<Day, DayDto> {
 
         dayDto.add(linkTo(methodOn(PlaneDayController.class)
                 .getDayById(day.getId())).withSelfRel());
-        if (date.isAfter(this.date)) {
+        if (dayDto.isPrev()) {
             dayDto.add(linkTo(methodOn(PlaneDayController.class)
                     .getDayByDate(date.minusDays(1))).withRel("prev_day"));
         }
-        if (date.isBefore(LocalDate.now())) {
+        if (dayDto.isNext()) {
             dayDto.add(linkTo(methodOn(PlaneDayController.class)
                     .getDayByDate(date.plusDays(1))).withRel("next_day"));
         }
-        if (day.getTotal() != 0) {
+        if (!day.getPlanes().isEmpty()) {
             dayDto.add(linkTo(methodOn(PlaneController.class)
                     .getPlanesByDate(date, null, null)).withRel("planes"));
         }
@@ -58,16 +59,43 @@ public class DayMapper extends ResourceAssemblerSupport<Day, DayDto> {
     }
 
     private DayDto dayToDayDto(Day day) {
-        int avgPlanes;
         int absPlanesDay = day.getTotal() - day.getPlanes23() - day.getPlanes0();
-        if (LocalDate.now().isEqual(day.getDate())) {
-            avgPlanes = absPlanesDay / (LocalDateTime.now().getHour() - 6);
+        LocalDate date = day.getDate();
+        boolean prev = date.isAfter(this.date);
+        boolean next = date.isBefore(LocalDate.now());
+        Integer[] avgPlanes;
+        Integer[] hours_wind;
+        int[] hours_plane;
+        if (LocalDate.now().isEqual(date)) {
+            int currentHour = LocalDateTime.now().getHour();
+            avgPlanes = new Integer[currentHour + 1];
+            hours_wind = new Integer[currentHour + 1];
+            if (currentHour <= 6) {
+                Arrays.fill(avgPlanes, null);
+                Arrays.fill(hours_wind, null);
+            } else {
+                Arrays.fill(avgPlanes, 0, 6, null);
+                Arrays.fill(avgPlanes, 6, avgPlanes.length, absPlanesDay / (currentHour - 6));
+                Arrays.fill(hours_wind, 0, 6, null);
+                for (int i = 6; i <= currentHour; i++){
+                    hours_wind[i] = day.getHoursWind()[i];
+                }
+            }
+            hours_plane = Arrays.copyOfRange(day.getHoursPlane(), 0, currentHour + 1);
         } else {
-            avgPlanes = absPlanesDay / 17;
+            avgPlanes = new Integer[24];
+            Arrays.fill(avgPlanes, 0, 6, null);
+            Arrays.fill(avgPlanes, 6, avgPlanes.length, absPlanesDay / 17);
+            hours_wind = new Integer[24];
+            Arrays.fill(hours_wind, 0, 6, null);
+            for (int i = 6; i < hours_wind.length; i++){
+                hours_wind[i] = day.getHoursWind()[i];
+            }
+            hours_plane = day.getHoursPlane();
         }
-        return new DayDto(day.getDate(), LocalDateTime.now(), day.getDate().getDayOfWeek().name(),
+        return new DayDto(date, LocalDateTime.now(), date.getDayOfWeek().name(), prev, next,
                 day.getTotal(), avgPlanes, day.getAvgAltitude(), day.getAvgSpeed(),
-                day.getWindSpeed(), day.getHoursPlane(), day.getHoursWind()
+                day.isLessThanThirtyPlanes(), day.getWindSpeed(), hours_plane, hours_wind
         );
     }
 }
