@@ -40,7 +40,7 @@ public class SwaggerConfig {
                 "Tracks planes landing <strong>DUS</strong> airport coming from the east " +
                         "- since <strong>9.9.2019</strong>." +
                         "\n\n<a href='https://j-o-e-d-o-e.github.io/traffic-tracker'>Angular client</a>",
-                "1.0",
+                "2.0",
                 null,
                 contact,
                 "Apache License Version 2.0",

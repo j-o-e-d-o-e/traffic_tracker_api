@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.ml.model.ForecastDaily;
+import net.joedoe.traffictracker.model.ForecastDay;
 import net.joedoe.traffictracker.repo.ForecastRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class ForecastService {
         this.repository = repository;
     }
 
-    public List<ForecastDaily> findAll() {
+    public List<ForecastDay> findAll() {
         return repository.findAll();
     }
 }

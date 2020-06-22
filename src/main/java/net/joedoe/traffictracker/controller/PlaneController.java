@@ -1,5 +1,6 @@
 package net.joedoe.traffictracker.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.PlaneDto;
 import net.joedoe.traffictracker.mapper.PlaneMapper;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
+@Api(value="Plane Controller", description = "Only planes for last 30 days stored")
 @RestController
 @RequestMapping("/planes")
 public class PlaneController {
@@ -30,37 +32,33 @@ public class PlaneController {
     }
 
     @GetMapping
-    public PagedResources<PlaneDto> getPlanesForCurrentDay(Pageable pageable,
-                                                           PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
+    public PagedResources<PlaneDto> getPlanesForCurrentDay(
+            Pageable pageable, PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
         return pagedAssembler.toResource(service.getPlanesByDate(LocalDate.now(), pageable), mapper);
     }
 
     @GetMapping("/{date}")
-    public PagedResources<PlaneDto> getPlanesByDate(@PathVariable("date")
-                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                                    Pageable pageable,
-                                                    PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
-        if (date == null) {
+    public PagedResources<PlaneDto> getPlanesByDate(
+            @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+            Pageable pageable, PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
+        if (date == null)
             return null;
-        }
         return pagedAssembler.toResource(service.getPlanesByDate(date, pageable), mapper);
     }
 
     @GetMapping("/id/{id}")
     public PlaneDto getPlaneById(@PathVariable("id") Long id) {
-        if (id == null) {
+        if (id == null)
             return null;
-        }
         return mapper.toResource(service.getPlaneById(id));
     }
 
     @GetMapping("/icao24/{icao_24}")
-    public PagedResources<PlaneDto> getPlanesByIcao24(@PathVariable("icao_24") String icao,
-                                                      Pageable pageable,
-                                                      PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
-        if (icao == null) {
+    public PagedResources<PlaneDto> getPlanesByIcao24(
+            @PathVariable("icao_24") String icao, Pageable pageable,
+            PagedResourcesAssembler<net.joedoe.traffictracker.model.Plane> pagedAssembler) {
+        if (icao == null)
             return null;
-        }
         return pagedAssembler.toResource(service.getPlanesByIcao(icao, pageable), mapper);
     }
 

@@ -1,7 +1,7 @@
 # traffic_tracker_api
 
 Rest api for tracking planes in a specified area including swagger and hateoas. Published on [heroku](https://traffic-tracker.herokuapp.com/swagger-ui.html).
-Includes [decision-tree-classifier](https://github.com/j-o-e-d-o-e/ml_planes) predicting whether planes are going to fly based on wind direction.
+Integrates with [machine learning model](https://github.com/j-o-e-d-o-e/py_traffic_tracker-forecasts) forecasting whether planes are going to fly based on wind direction.
 
 ## Live client
 
