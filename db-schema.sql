@@ -33,3 +33,25 @@ create table plane
 );
 alter table plane
     add constraint FKjhoo1xphjapbq7mr33orrvhfq foreign key (day_id) references day;
+
+drop table if exists forecast_hour;
+drop table if exists forecast_day;
+
+create table forecast_day
+(
+    id  bigserial not null,
+    date date,
+    probability float4,
+    primary key (id)
+);
+create table forecast_hour
+(
+    id  bigserial not null,
+    time time,
+    probability float4,
+    wind_degree int4,
+    hour_id int8,
+    primary key (id)
+);
+alter table forecast_hour
+    add constraint FKcc2t0r98asl351eng2acqfrlq foreign key (hour_id) references forecast_day;
