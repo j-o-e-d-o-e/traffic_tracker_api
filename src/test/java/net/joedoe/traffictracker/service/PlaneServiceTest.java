@@ -1,6 +1,6 @@
 package net.joedoe.traffictracker.service;
 
-import net.joedoe.traffictracker.bootstrap.PlanesInitTest;
+import net.joedoe.traffictracker.bootstrap.PlanesInit;
 import net.joedoe.traffictracker.model.Plane;
 import net.joedoe.traffictracker.repo.PlaneRepository;
 import org.junit.Before;
@@ -14,8 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +27,7 @@ public class PlaneServiceTest {
     private PlaneService service;
     @Mock
     private PlaneRepository repository;
-    private LocalDate date = LocalDate.now();
-    private List<Plane> planes = PlanesInitTest.createPlanes(date);
+    private final List<Plane> planes = PlanesInit.createPlanes();
 
     @Before
     public void setUp() {
@@ -39,87 +36,31 @@ public class PlaneServiceTest {
 
     @Test
     public void getPlaneById() {
-        Plane plane = planes.get(0);
+        Plane exp = planes.get(0);
 
-        when(repository.getPlaneById(plane.getId())).thenReturn(plane);
-        Plane plane1 = service.getPlaneById(plane.getId());
+        when(repository.getPlaneById(exp.getId())).thenReturn(Optional.of(exp));
+        Plane act = service.getPlaneById(exp.getId());
 
-        assertEquals(plane.getDate(), plane1.getDate());
+        assertEquals(exp.getDate(), act.getDate());
     }
 
     @Test
     public void getPlanesByDate() {
-        Page<Plane> page = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
+        Page<Plane> exp = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
 
-        when(repository.getPlanesByDateBetweenOrderByDateDesc(any(), any(), any())).thenReturn(Optional.of(page));
-        Page<Plane> planes = service.getPlanesByDate(date, Pageable.unpaged());
+        when(repository.getPlanesByDateBetweenOrderByDateDesc(any(), any(), any())).thenReturn(Optional.of(exp));
+        Page<Plane> act = service.getPlanesByDate(LocalDate.now(), Pageable.unpaged());
 
-        assertEquals(page.getSize(), planes.getSize());
+        assertEquals(exp.getSize(), act.getSize());
     }
 
     @Test
     public void getPlanesByIcao() {
-        Page<Plane> page = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
+        Page<Plane> exp = new PageImpl<>(planes, PageRequest.of(0, 20), 1);
 
-        when(repository.getPlanesByIcaoOrderByDateDesc(anyString(), any())).thenReturn(Optional.of(page));
-        Page<Plane> planes = service.getPlanesByIcao("", null);
+        when(repository.getPlanesByIcaoOrderByDateDesc(anyString(), any())).thenReturn(Optional.of(exp));
+        Page<Plane> act = service.getPlanesByIcao("", null);
 
-        assertEquals(page.getSize(), planes.getSize());
-    }
-
-    @Test
-    public void getPlanesWithMaxAltitude() {
-        Plane plane = Collections.max(planes, Comparator.comparing(Plane::getAltitude));
-
-        when(repository.getPlanesWithMaxAltitude()).thenReturn(Optional.of(Collections.singletonList(plane)));
-        List<Plane> planes = service.getPlanesWithMaxAltitude();
-
-        Plane plane1 = planes.get(0);
-        assertEquals(plane.getIcao(), plane1.getIcao());
-        assertEquals(plane.getDate(), plane1.getDate());
-        assertEquals(plane.getAltitude(), plane1.getAltitude());
-        assertEquals(plane.getSpeed(), plane1.getSpeed());
-    }
-
-    @Test
-    public void getPlanesWithMaxSpeed() {
-        Plane plane = Collections.max(planes, Comparator.comparing(Plane::getSpeed));
-
-        when(repository.getPlanesWithMaxSpeed()).thenReturn(Optional.of(Collections.singletonList(plane)));
-        List<Plane> planes = service.getPlanesWithMaxSpeed();
-
-        Plane plane1 = planes.get(0);
-        assertEquals(plane.getIcao(), plane1.getIcao());
-        assertEquals(plane.getDate(), plane1.getDate());
-        assertEquals(plane.getAltitude(), plane1.getAltitude());
-        assertEquals(plane.getSpeed(), plane1.getSpeed());
-    }
-
-    @Test
-    public void getPlanesWithMinAltitude() {
-        Plane plane = Collections.min(planes, Comparator.comparing(Plane::getAltitude));
-
-        when(repository.getPlanesWithMinAltitude()).thenReturn(Optional.of(Collections.singletonList(plane)));
-        List<Plane> planes = service.getPlanesWithMinAltitude();
-
-        Plane plane1 = planes.get(0);
-        assertEquals(plane.getIcao(), plane1.getIcao());
-        assertEquals(plane.getDate(), plane1.getDate());
-        assertEquals(plane.getAltitude(), plane1.getAltitude());
-        assertEquals(plane.getSpeed(), plane1.getSpeed());
-    }
-
-    @Test
-    public void getPlanesWithMinSpeed() {
-        Plane plane = Collections.min(planes, Comparator.comparing(Plane::getSpeed));
-
-        when(repository.getPlanesWithMinSpeed()).thenReturn(Optional.of(Collections.singletonList(plane)));
-        List<Plane> planes = service.getPlanesWithMinSpeed();
-
-        Plane plane1 = planes.get(0);
-        assertEquals(plane.getIcao(), plane1.getIcao());
-        assertEquals(plane.getDate(), plane1.getDate());
-        assertEquals(plane.getAltitude(), plane1.getAltitude());
-        assertEquals(plane.getSpeed(), plane1.getSpeed());
+        assertEquals(exp.getSize(), act.getSize());
     }
 }

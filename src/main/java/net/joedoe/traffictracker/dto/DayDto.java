@@ -3,14 +3,17 @@ package net.joedoe.traffictracker.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DayDto extends ResourceSupport {
     private LocalDate date;
     private LocalDateTime now;
@@ -25,4 +28,6 @@ public class DayDto extends ResourceSupport {
     private float wind_speed;
     private int[] hours_plane;
     private Integer[] hours_wind;
+    private DeparturesDto departures;
+    private List<MapEntryDto> airports;
 }

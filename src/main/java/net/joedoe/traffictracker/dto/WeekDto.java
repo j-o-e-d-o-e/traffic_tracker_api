@@ -3,14 +3,17 @@ package net.joedoe.traffictracker.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class WeekDto extends ResourceSupport {
     private LocalDate start_date;
     private LocalDate end_date;
@@ -26,4 +29,6 @@ public class WeekDto extends ResourceSupport {
     private int avg_altitude;
     private int avg_speed;
     private int[] weekdays;
+    private DeparturesDto departures;
+    private List<MapEntryDto> airports;
 }

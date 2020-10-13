@@ -2,6 +2,7 @@ package net.joedoe.traffictracker.client;
 
 import net.joedoe.traffictracker.service.DayService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -17,6 +18,7 @@ public class PlaneClientTest {
         client = new PlaneClient(service);
     }
 
+    @Ignore
     @Test
     public void fetchPlanes() {
         client.fetchPlanes();

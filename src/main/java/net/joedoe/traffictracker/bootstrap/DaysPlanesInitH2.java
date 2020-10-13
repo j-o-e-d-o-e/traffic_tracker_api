@@ -49,6 +49,10 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
         plane1.setDate(dateTime.minus(9, ChronoUnit.MINUTES));
         plane1.setIcao("3c56f0");
         plane1.setSpeed(343);
+        plane1.setDepartureAirport("AIRP");
+        plane1.setDepartureAirportName("Airport");
+        plane1.setAirline("AIR");
+        plane1.setAirlineName("Airline");
         day.addPlane(plane1);
 
         Plane plane2 = new Plane();
@@ -56,6 +60,10 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
         plane2.setDate(dateTime.minusMinutes(7));
         plane2.setIcao("3c6743");
         plane2.setSpeed(355);
+        plane2.setDepartureAirport("AIR2");
+        plane2.setDepartureAirportName("Airport2");
+        plane2.setAirline("AIS");
+        plane2.setAirlineName("Aisline");
         day.addPlane(plane2);
 
         Plane plane3 = new Plane();
@@ -63,6 +71,10 @@ public class DaysPlanesInitH2 implements CommandLineRunner {
         plane3.setDate(dateTime.minusSeconds(300));
         plane3.setIcao("40083b");
         plane3.setSpeed(362);
+        plane3.setDepartureAirport("AIR3");
+        plane3.setDepartureAirportName("Airport3");
+        plane3.setAirline("AIT");
+        plane3.setAirlineName("AITline");
         day.addPlane(plane3);
     }
 

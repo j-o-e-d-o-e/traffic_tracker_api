@@ -5,63 +5,60 @@ import net.joedoe.traffictracker.model.MapData;
 import net.joedoe.traffictracker.model.MapData.CurrentPlane;
 import net.joedoe.traffictracker.model.Plane;
 import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.utils.PropertiesHandler;
 import org.opensky.api.OpenSkyApi;
 import org.opensky.api.OpenSkyApi.BoundingBox;
 import org.opensky.model.OpenSkyStates;
 import org.opensky.model.StateVector;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
-@PropertySource("classpath:planes.properties")
 @Slf4j
 @Component
 public class PlaneClient {
-    private DayService service;
-    private List<CurrentPlane> currentPlanes = new ArrayList<>();
-    private OpenSkyApi api = new OpenSkyApi();
+    private final DayService service;
+    private final OpenSkyApi api = new OpenSkyApi();
     private BoundingBox box;
-    @Value("${minLatitude}")
-    float minLatitude;
-    @Value("${maxLatitude}")
-    float maxLatitude;
-    @Value("${minLongitude}")
-    float minLongitude;
-    @Value("${maxLongitude}")
-    float maxLongitude;
-    @Value("${minHeading}")
     private int minHeading;
-    @Value("${maxHeading}")
     private int maxHeading;
-    @Value("${minGeoAltitude}")
     private int minAltitude;
-    @Value("${maxGeoAltitude}")
     private int maxAltitude;
-    @Value("${minSpeed}")
     private int minSpeed;
-    @Value("${timeout}")
     private int timeout;
-    @Value("${inLongitude}")
     private float inLongitude;
-    @Value("${inLatitude}")
     private float inLatitude;
+    private Properties airlines;
+    private List<CurrentPlane> currentPlanes = new ArrayList<>();
     private boolean updated;
 
     public PlaneClient(DayService service) {
         this.service = service;
-    }
-
-    @PostConstruct
-    public void afterPropertiesSet() {
-        box = new BoundingBox(minLatitude, maxLatitude, minLongitude, maxLongitude);
+        try {
+            Properties prop = PropertiesHandler.getProperties("src/main/resources/planes.properties");
+            float minLatitude = Float.parseFloat(prop.getProperty("min.latitude"));
+            float minLongitude = Float.parseFloat(prop.getProperty("min.longitude"));
+            float maxLatitude = Float.parseFloat(prop.getProperty("max.latitude"));
+            float maxLongitude = Float.parseFloat(prop.getProperty("max.longitude"));
+            this.box = new BoundingBox(minLatitude, maxLatitude, minLongitude, maxLongitude);
+            this.inLatitude = Float.parseFloat(prop.getProperty("in.latitude"));
+            this.inLongitude = Float.parseFloat(prop.getProperty("in.longitude"));
+            this.minHeading = Integer.parseInt(prop.getProperty("min.heading"));
+            this.maxHeading = Integer.parseInt(prop.getProperty("max.heading"));
+            this.minAltitude = Integer.parseInt(prop.getProperty("min.geo.altitude"));
+            this.maxAltitude = Integer.parseInt(prop.getProperty("max.geo.altitude"));
+            this.minSpeed = Integer.parseInt(prop.getProperty("min.speed"));
+            this.timeout = Integer.parseInt(prop.getProperty("timeout"));
+            this.airlines = PropertiesHandler.getProperties("src/main/resources/airlinesList.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Scheduled(fixedRate = 20000)
@@ -99,6 +96,12 @@ public class PlaneClient {
                     plane.setDate(LocalDateTime.now());
                     plane.setAltitude(getAltitude(vector));
                     plane.setSpeed(getSpeed(vector));
+                    String callsign = vector.getCallsign();
+                    if (callsign != null) {
+                        String airline = callsign.substring(0, 3);
+                        plane.setAirline(airline);
+                        plane.setAirlineName(airlines.getProperty(airline));
+                    }
                     service.addPlane(plane);
                     currentPlane = new CurrentPlane(plane, vector.getLongitude(), vector.getLatitude());
                     this.currentPlanes.add(currentPlane);

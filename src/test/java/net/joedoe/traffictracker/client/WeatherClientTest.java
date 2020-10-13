@@ -2,6 +2,7 @@ package net.joedoe.traffictracker.client;
 
 import net.joedoe.traffictracker.service.DayService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -17,8 +18,9 @@ public class WeatherClientTest {
         client = new WeatherClient(service);
     }
 
+    @Ignore
     @Test
     public void fetchWeather() {
-//        client.fetchWeather();
+        client.fetchWeather();
     }
 }

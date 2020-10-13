@@ -1,6 +1,6 @@
 package net.joedoe.traffictracker.service;
 
-import net.joedoe.traffictracker.bootstrap.DaysInitTest;
+import net.joedoe.traffictracker.bootstrap.DaysInit;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.model.Plane;
 import net.joedoe.traffictracker.model.Wind;
@@ -26,9 +26,8 @@ public class DayServiceTest {
     private DayService service;
     @Mock
     private DayRepository repository;
-    private LocalDate date = LocalDate.now();
-    private LocalDateTime dateTime = LocalDateTime.now();
-    private List<Day> days = DaysInitTest.createDays(date);
+    private final LocalDate date = LocalDate.now();
+    private final LocalDateTime dateTime = LocalDateTime.now();
 
     @Before
     public void setUp() {
@@ -67,7 +66,7 @@ public class DayServiceTest {
 
     @Test
     public void getDayById() {
-        Day day = days.get(0);
+        Day day = DaysInit.createDay(LocalDate.now());
 
         when(repository.getDayById(anyLong())).thenReturn(Optional.of(day));
         Day dayByDate = service.getDayById(day.getId());
@@ -77,17 +76,18 @@ public class DayServiceTest {
 
     @Test
     public void getDay() {
-        Day day = days.get(0);
+        Day day = DaysInit.createDay(LocalDate.now().minusDays(1));
 
         when(repository.getDayByDate(date)).thenReturn(Optional.of(day));
         Day dayByDate = service.getDay(date);
 
-        assertEquals(date, dayByDate.getDate());
+        assertEquals(date.minusDays(1), dayByDate.getDate());
     }
 
     @Test
     public void getWeek() {
         LocalDate date = this.date.with(DayOfWeek.MONDAY);
+        List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
 
         when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1))).thenReturn(Optional.of(days));
         List<Day> daysOfWeek = service.getWeek(date);
@@ -98,6 +98,7 @@ public class DayServiceTest {
     @Test
     public void getMonth() {
         LocalDate date = this.date.withDayOfMonth(1);
+        List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfMonth() - 1);
 
         when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1))).thenReturn(Optional.of(days));
         List<Day> daysOfMonth = service.getMonth(date);
@@ -108,6 +109,7 @@ public class DayServiceTest {
     @Test
     public void getYear() {
         LocalDate date = this.date.withDayOfMonth(1).withMonth(1);
+        List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfYear() - 1);
 
         when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1))).thenReturn(Optional.of(days));
         List<Day> daysOfYear = service.getYear(date);

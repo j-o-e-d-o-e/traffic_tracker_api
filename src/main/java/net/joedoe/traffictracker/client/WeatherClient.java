@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.client.WeatherClient.DataWrapper.WindData;
 import net.joedoe.traffictracker.model.Wind;
 import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.utils.PropertiesHandler;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -19,18 +20,22 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@PropertySource({"classpath:weather.properties", "classpath:locale.properties"})
+@PropertySource("classpath:locale.properties")
 @Slf4j
 @Component
 public class WeatherClient {
     private final DayService service;
-    private ObjectMapper mapper = new ObjectMapper();
-    @Value("${weatherUrl}")
+    private final ObjectMapper mapper = new ObjectMapper();
     private String url;
 
     public WeatherClient(DayService service) {
         this.service = service;
         this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try {
+            this.url = PropertiesHandler.getProperties("src/main/resources/weather.properties").getProperty("url.weather");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Scheduled(cron = "0 30 6-23 * * *", zone = "${timezone}")

@@ -24,6 +24,14 @@ public class Plane {
     private int altitude;
     @Column
     private int speed;
+    @Column
+    private String departureAirport;
+    @Column
+    private String departureAirportName;
+    @Column
+    private String airline;
+    @Column
+    private String airlineName;
     @SuppressWarnings("JpaDataSourceORMInspection")
     @ToString.Exclude
     @ManyToOne

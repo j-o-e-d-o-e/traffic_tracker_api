@@ -16,21 +16,11 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface PlaneRepository extends JpaRepository<Plane, Long> {
 
-    Plane getPlaneById(Long id);
+    Optional<Plane> getPlaneById(Long id);
+
+    Optional<List<Plane>> getPlanesByDateBetweenOrderByDateDesc(LocalDateTime dateBefore, LocalDateTime dateAfter);
 
     Optional<Page<Plane>> getPlanesByDateBetweenOrderByDateDesc(LocalDateTime dateBefore, LocalDateTime dateAfter, Pageable pageable);
 
     Optional<Page<Plane>> getPlanesByIcaoOrderByDateDesc(String icao, Pageable pageable);
-
-    @Query("SELECT p from Plane p WHERE p.altitude = (SELECT MAX(altitude) FROM Plane)")
-    Optional<List<Plane>> getPlanesWithMaxAltitude();
-
-    @Query("SELECT p from Plane p WHERE p.speed = (SELECT MAX(speed) FROM Plane)")
-    Optional<List<Plane>> getPlanesWithMaxSpeed();
-
-    @Query("SELECT p from Plane p WHERE p.altitude = (SELECT MIN(altitude) FROM Plane)")
-    Optional<List<Plane>> getPlanesWithMinAltitude();
-
-    @Query("SELECT p from Plane p WHERE p.speed = (SELECT MIN(speed) FROM Plane)")
-    Optional<List<Plane>> getPlanesWithMinSpeed();
 }
