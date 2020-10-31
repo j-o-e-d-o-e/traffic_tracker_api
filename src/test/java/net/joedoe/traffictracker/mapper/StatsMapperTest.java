@@ -26,7 +26,7 @@ public class StatsMapperTest {
     }
 
     @Test
-    public void iterate() {
+    public void iterateDays() {
         int total = days.stream().mapToInt(Day::getTotal).sum();
         int dayWithMostFlights = Collections.max(days, Comparator.comparing(Day::getTotal)).getTotal();
         StatsDto act = mapper.toStatsDto(days, null);
@@ -34,5 +34,7 @@ public class StatsMapperTest {
         assertEquals(total, act.getTotal());
         assertEquals(dayWithMostFlights, act.getDay_with_most_flights().getStats());
         log.info("" + act.getAirlines());
+        log.info(String.valueOf(act.getDays_with_less_than_thirty_flights()));
+        log.info(String.valueOf(act.getHours_with_no_flights()));
     }
 }

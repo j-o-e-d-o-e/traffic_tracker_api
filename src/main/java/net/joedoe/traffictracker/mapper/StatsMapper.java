@@ -11,6 +11,7 @@ import net.joedoe.traffictracker.model.ForecastScore;
 import net.joedoe.traffictracker.model.Plane;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -37,6 +38,7 @@ public class StatsMapper {
         DeparturesDto departuresDto = new DeparturesDto();
         Map<String, Integer> airports = new HashMap<>();
         Map<String, Integer> flights = new HashMap<>();
+        int daysWithLessThanThirtyFlights = 0, hoursWithNoFlights = 0;
         StatsPlane planeWithMostFlightsWithinOneDay = new StatsPlane();
         Plane maxAltitude = null, minAltitude = null, maxSpeed = null, minSpeed = null;
         Map<String, Integer> airlines = new HashMap<>();
@@ -52,10 +54,15 @@ public class StatsMapper {
                 dayWithMostFlightsWithinOneHour = day;
                 mostFlightsWithinOneHour = tmp;
             }
-            if (day.getDeparturesTop().isEmpty()) continue;
+            if (day.getDate().isBefore(LocalDate.now())) {
+                // days with less than 30 planes
+                if (day.isLessThanThirtyPlanes()) daysWithLessThanThirtyFlights++;
+                // hours with no planes
+                hoursWithNoFlights += Arrays.stream(Arrays.copyOfRange(day.getHoursPlane(), 6, 23)).filter(h -> h == 0).count();
+            }
             // departures
-            DaysMapperUtil.incrementDepartures(day, departuresDto, airports);
-            if (day.getPlanes() == null) continue;
+            if (day.getDeparturesTop().size() > 0)
+                DaysMapperUtil.incrementDepartures(day, departuresDto, airports);
             Map<String, Integer> flightsDaily = new HashMap<>();
             for (Plane plane : day.getPlanes()) {
                 // plane_with_most_flights
@@ -75,10 +82,10 @@ public class StatsMapper {
                 else if (minAltitude == null || plane.getAltitude() <= minAltitude.getAltitude())
                     minAltitude = plane;
                 // max_speed
-                if (maxSpeed == null || plane.getAltitude() >= maxSpeed.getAltitude())
+                if (maxSpeed == null || plane.getSpeed() >= maxSpeed.getSpeed())
                     maxSpeed = plane;
                     // min_speed
-                else if (minSpeed == null || plane.getAltitude() <= minSpeed.getAltitude())
+                else if (minSpeed == null || plane.getSpeed() <= minSpeed.getSpeed())
                     minSpeed = plane;
                 // airlines
                 String airline = plane.getAirlineName() == null ? plane.getAirline() : plane.getAirlineName();
@@ -102,6 +109,10 @@ public class StatsMapper {
         statsDto.setDay_with_most_flights(statsDay);
         statsDay = new StatsDay(dayMapper.toResource(dayWithMostFlightsWithinOneHour), mostFlightsWithinOneHour);
         statsDto.setDay_with_most_flights_within_one_hour(statsDay);
+        float percentage = (daysWithLessThanThirtyFlights / (float) (days.size() - 1)) * 100;
+        statsDto.setDays_with_less_than_thirty_flights(Math.round(percentage * 100) / 100f);
+        percentage = (hoursWithNoFlights / ((float) 17 * (days.size() - 1))) * 100;
+        statsDto.setHours_with_no_flights(Math.round(percentage * 100) / 100f);
         statsDto.setDepartures(DaysMapperUtil.setDepartures(departuresDto));
         statsDto.setAirports(DaysMapperUtil.mapToList(airports, 10));
         statsDto.setPlane_with_most_flights(getPlaneWithMostFlights(flights));

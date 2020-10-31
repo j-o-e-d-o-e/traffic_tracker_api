@@ -24,12 +24,12 @@ public class DaysInit {
         day.setId((long) date.getDayOfYear());
         day.setDate(date);
         day.setTotal(100);
-        day.setLessThanThirtyPlanes(false);
+        day.setLessThanThirtyPlanes(Math.random() >= 0.5);
         day.setPlanes23(10);
         day.setPlanes0(10);
         day.setAvgAltitude(930);
         day.setAvgSpeed(326);
-        day.setHoursPlane(new int[]{0, 0, 0, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
+        day.setHoursPlane(new int[]{0, 0, 0, 0, 0, 0, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 21, 22, 23});
         day.setPlanes(PlanesInit.createPlanes(day));
         day.setWindSpeed(17.64f);
         day.setHoursWind(new int[]{0, 0, 0, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});

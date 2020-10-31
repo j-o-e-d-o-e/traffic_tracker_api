@@ -14,6 +14,8 @@ public class StatsDto {
     private int total;
     private StatsDay day_with_most_flights;
     private StatsDay day_with_most_flights_within_one_hour;
+    private float days_with_less_than_thirty_flights;
+    private float hours_with_no_flights;
     private DeparturesDto departures;
     private List<MapEntryDto> airports;
     private StatsPlane plane_with_most_flights;
