@@ -86,7 +86,7 @@ public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
             if (day.isLessThanThirtyPlanes())
                 absDaysWithLessThanThirtyPlanes += 1;
             monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
-            if (day.getDeparturesTop().size()== 0) continue;
+            if (day.getDeparturesTop().size() == 0) continue;
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         monthDto.setTotal(total);
@@ -114,7 +114,8 @@ public class MonthMapper extends ResourceAssemblerSupport<List<Day>, MonthDto> {
             Arrays.fill(avgPlanes, 0, this.date.getDayOfMonth() - 1, null);
             Arrays.fill(avgPlanes, this.date.getDayOfMonth() - 1, avgPlanes.length, total / days.size());
         } else {
-            if (LocalDate.now().getMonth().equals(date.getMonth())) { // current month (now)
+            LocalDate now = LocalDate.now();
+            if (now.getYear() == date.getYear() && now.getMonth().equals(date.getMonth())) { // current month
                 avgPlanes = new Integer[LocalDate.now().getDayOfMonth()];
             } else { // earlier month (but not Sept 2019)
                 avgPlanes = new Integer[date.getMonth().length(date.isLeapYear())];
