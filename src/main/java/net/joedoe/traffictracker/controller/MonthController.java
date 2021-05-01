@@ -1,9 +1,10 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.hateoas.MonthAssembler;
 import net.joedoe.traffictracker.dto.MonthDto;
-import net.joedoe.traffictracker.mapper.MonthMapper;
-import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.MonthService;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,27 +14,25 @@ import java.time.LocalDate;
 
 @Slf4j
 @RestController
-@RequestMapping("/planes/month")
+@RequestMapping("/api/months")
 public class MonthController {
-    private final DayService service;
-    private final MonthMapper mapper;
+    private final MonthService service;
+    private final MonthAssembler assembler;
 
-    public MonthController(DayService service, MonthMapper mapper) {
+    public MonthController(MonthService service, MonthAssembler assembler) {
         this.service = service;
-        this.mapper = mapper;
+        this.assembler = assembler;
     }
 
-    @GetMapping()
-    public MonthDto getCurrentMonth() {
-        return mapper.toResource(service.getMonth(LocalDate.now().withDayOfMonth(1)));
+    @GetMapping("/current")
+    public EntityModel<?> getCurrentMonth() {
+        MonthDto monthDto = service.getMonth(LocalDate.now().withDayOfMonth(1));
+        return assembler.toModel(monthDto);
     }
 
     @GetMapping("/{year}/{month}")
-    public MonthDto getMonthByDate(@PathVariable("year") Integer year, @PathVariable("month") Integer month) {
-        if (year == null || month == null) {
-            return null;
-        }
-        LocalDate date = LocalDate.of(year, month, 1);
-        return mapper.toResource(service.getMonth(date));
+    public EntityModel<?> getMonthByDate(@PathVariable("year") Integer year, @PathVariable("month") Integer month) {
+        MonthDto monthDto = service.getMonth(LocalDate.of(year, month, 1));
+        return assembler.toModel(monthDto);
     }
 }

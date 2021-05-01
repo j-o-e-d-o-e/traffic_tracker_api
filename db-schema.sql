@@ -1,9 +1,8 @@
 -- noinspection SqlNoDataSourceInspectionForFile
-drop table if exists plane;
+drop table if exists flight;
 drop table if exists day;
 
-create table day
-(
+create table day (
     id  bigserial not null,
     abs_altitude int4,
     abs_speed int4,
@@ -20,17 +19,17 @@ create table day
     departures_national_abs int4,
     departures_unknown float4,
     departures_unknown_abs int4,
-    hours_plane bytea,
+    flights0 int4,
+    flights23 int4,
+    hours_flight bytea,
     hours_wind bytea,
-    less_than_thirty_planes boolean,
-    planes0 int4,
-    planes23 int4,
+    less_than_thirty_flights boolean,
     total int4,
     wind_speed float4,
     primary key (id)
-  );
-create table plane
-(
+);
+
+create table flight (
     id  bigserial not null,
     airline varchar(255),
     altitude int4,
@@ -43,8 +42,10 @@ create table plane
     day_id int8,
     primary key (id)
 );
-alter table plane
+alter table flight
     add constraint FKjhoo1xphjapbq7mr33orrvhfq foreign key (day_id) references day;
+
+
 
 drop table if exists forecast_hour;
 drop table if exists forecast_day;

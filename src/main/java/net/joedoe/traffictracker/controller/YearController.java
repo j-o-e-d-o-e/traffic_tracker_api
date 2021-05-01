@@ -1,9 +1,10 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.hateoas.YearAssembler;
 import net.joedoe.traffictracker.dto.YearDto;
-import net.joedoe.traffictracker.mapper.YearMapper;
-import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.YearService;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,28 +14,25 @@ import java.time.LocalDate;
 
 @Slf4j
 @RestController
-@RequestMapping("/planes/year")
+@RequestMapping("/api/years")
 public class YearController {
-    private final DayService service;
-    private final YearMapper mapper;
+    private final YearService service;
+    private final YearAssembler assembler;
 
-    public YearController(DayService service, YearMapper mapper) {
+    public YearController(YearService service, YearAssembler assembler) {
         this.service = service;
-        this.mapper = mapper;
+        this.assembler = assembler;
     }
 
-    @GetMapping()
-    public YearDto getCurrentYear() {
-        LocalDate date = LocalDate.now().withDayOfMonth(1).withMonth(1);
-        return mapper.toResource(service.getYear(date));
+    @GetMapping("/current")
+    public EntityModel<?> getCurrentYear() {
+        YearDto yearDto = service.getYear(LocalDate.now().withDayOfMonth(1).withMonth(1));
+        return assembler.toModel(yearDto);
     }
 
     @GetMapping("/{year}")
-    public YearDto getYearByDate(@PathVariable("year") Integer year) {
-        if (year == null) {
-            return null;
-        }
-        LocalDate date = LocalDate.of(year, 1, 1);
-        return mapper.toResource(service.getYear(date));
+    public EntityModel<?> getYearByDate(@PathVariable("year") Integer year) {
+        YearDto yearDto = service.getYear(LocalDate.of(year, 1, 1));
+        return assembler.toModel(yearDto);
     }
 }

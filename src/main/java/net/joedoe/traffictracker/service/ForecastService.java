@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class ForecastService {
-    private ForecastRepository repository;
+    private final ForecastRepository repository;
 
     public ForecastService(ForecastRepository repository) {
         this.repository = repository;

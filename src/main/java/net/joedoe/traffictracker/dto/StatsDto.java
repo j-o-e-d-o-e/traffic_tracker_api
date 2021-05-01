@@ -20,10 +20,10 @@ public class StatsDto {
     private List<MapEntryDto> airports;
     private StatsPlane plane_with_most_flights;
     private StatsPlane plane_with_most_flights_within_one_day;
-    private PlaneDto max_altitude;
-    private PlaneDto min_altitude;
-    private PlaneDto max_speed;
-    private PlaneDto min_speed;
+    private FlightDto max_altitude;
+    private FlightDto min_altitude;
+    private FlightDto max_speed;
+    private FlightDto min_speed;
     private List<MapEntryDto> airlines;
     private ForecastScoreDto score;
 

@@ -1,59 +1,32 @@
 package net.joedoe.traffictracker.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.controller.DayController;
-import net.joedoe.traffictracker.controller.MonthController;
-import net.joedoe.traffictracker.controller.WeekController;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.utils.PropertiesHandler;
+import net.joedoe.traffictracker.util.PropertiesHandler;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 @Slf4j
 @Component
-public class WeekMapper extends ResourceAssemblerSupport<List<Day>, WeekDto> {
-    private LocalDate date;
+public class WeekMapper {
+    private static LocalDate date;
 
-    public WeekMapper() {
-        super(WeekController.class, WeekDto.class);
+    static {
         try {
-            this.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("startDate"));
+            WeekMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("startDate"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public WeekDto toResource(List<Day> days) {
-        if (days.size() == 0)
-            return null;
-        LocalDate date = days.get(0).getDate();
-        WeekDto weekDto = daysToWeekDto(date.with(DayOfWeek.MONDAY), days);
-        LocalDate startDate = weekDto.getStart_date();
-
-        weekDto.add(linkTo(methodOn(WeekController.class).getWeekByDate(date)).withSelfRel());
-        if (weekDto.isPrev())
-            weekDto.add(linkTo(methodOn(WeekController.class).getWeekByDate(startDate.minusWeeks(1))).withRel("prev_week"));
-        if (weekDto.isNext())
-            weekDto.add(linkTo(methodOn(WeekController.class).getWeekByDate(startDate.plusWeeks(1))).withRel("next_week"));
-        weekDto.add(linkTo(methodOn(DayController.class).getDayByDate(startDate)).withRel("days"));
-        weekDto.add(linkTo(methodOn(MonthController.class).getMonthByDate(date.getYear(), date.getMonthValue())).withRel("month"));
-        return weekDto;
-    }
-
-    private WeekDto daysToWeekDto(LocalDate date, List<Day> days) {
+    public static WeekDto toDto(LocalDate date, List<Day> days) {
         WeekDto weekDto = new WeekDto();
         weekDto.setStart_date(date);
         LocalDate endDate = date.plusDays(6);
@@ -61,17 +34,17 @@ public class WeekMapper extends ResourceAssemblerSupport<List<Day>, WeekDto> {
         weekDto.setNow(LocalDateTime.now());
         weekDto.setYear(date.getYear());
         weekDto.setMonth(date.getMonthValue());
-        weekDto.setPrev(date.minusDays(6).isAfter(this.date));
+        weekDto.setPrev(date.minusDays(6).isAfter(WeekMapper.date));
         weekDto.setNext(endDate.isBefore(LocalDate.now()));
 
-        int total = 0, planes23 = 0, planes0 = 0, absAltitude = 0, absSpeed = 0;
+        int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0;
         int[] weekdays = new int[7];
         DeparturesDto departuresDto = new DeparturesDto();
         Map<String, Integer> departures = new HashMap<>();
         for (Day day : days) {
             total += day.getTotal();
-            planes23 += day.getPlanes23();
-            planes0 += day.getPlanes0();
+            flights23 += day.getFlights23();
+            flights0 += day.getFlights0();
             absAltitude += day.getAbsAltitude();
             absSpeed += day.getAbsSpeed();
             weekdays[day.getDate().getDayOfWeek().getValue() - 1] = day.getTotal();
@@ -79,9 +52,9 @@ public class WeekMapper extends ResourceAssemblerSupport<List<Day>, WeekDto> {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         weekDto.setTotal(total);
-        weekDto.setAvg_planes(getAvgPlanes(date, days, total));
-        weekDto.setPlanes_23(planes23);
-        weekDto.setPlanes_0(planes0);
+        weekDto.setAvg_flights(getAvgFlights(date, days, total));
+        weekDto.setFlights_23(flights23);
+        weekDto.setFlights_0(flights0);
         if (total != 0) {
             weekDto.setAvg_altitude(absAltitude / total);
             weekDto.setAvg_speed(absSpeed / total);
@@ -93,14 +66,14 @@ public class WeekMapper extends ResourceAssemblerSupport<List<Day>, WeekDto> {
     }
 
     @NotNull
-    private int[] getAvgPlanes(LocalDate date, List<Day> days, int total) {
-        int[] avgPlanes;
+    private static int[] getAvgFlights(LocalDate date, List<Day> days, int total) {
+        int[] avgFlights;
         if (LocalDate.now().isBefore(date.plusDays(7))) { // current week
-            avgPlanes = new int[LocalDate.now().getDayOfWeek().getValue()];
+            avgFlights = new int[LocalDate.now().getDayOfWeek().getValue()];
         } else {
-            avgPlanes = new int[7];
+            avgFlights = new int[7];
         }
-        Arrays.fill(avgPlanes, total / days.size());
-        return avgPlanes;
+        Arrays.fill(avgFlights, total / days.size());
+        return avgFlights;
     }
 }

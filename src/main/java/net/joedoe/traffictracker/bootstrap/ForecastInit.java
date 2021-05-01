@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(3)
 public class ForecastInit implements CommandLineRunner {
-    private ForecastClient client;
+    private final ForecastClient client;
 
     public ForecastInit(ForecastClient client) {
         this.client = client;

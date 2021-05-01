@@ -25,20 +25,20 @@ public class Day {
     @Column
     private int total;
     @Column
-    private boolean lessThanThirtyPlanes = true;
+    private boolean lessThanThirtyFlights = true;
     @Column
-    private int planes23;
+    private int flights23;
     @Column
-    private int planes0;
+    private int flights0;
     @Column
     private int avgAltitude;
     @Column
     private int avgSpeed;
     @SuppressWarnings("JpaAttributeTypeInspection")
     @Column
-    private int[] hoursPlane = new int[24];
+    private int[] hoursFlight = new int[24];
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "day", orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Plane> planes = new ArrayList<>();
+    private List<Flight> flights = new ArrayList<>();
     @Column
     private float windSpeed;
     @SuppressWarnings("JpaAttributeTypeInspection")
@@ -76,27 +76,27 @@ public class Day {
         this.date = date;
     }
 
-    public void addPlane(Plane plane) {
+    public void addFlight(Flight flight) {
         total += 1;
-        lessThanThirtyPlanes = total < 30;
-        if (plane.getDate().toLocalTime().isAfter(LocalTime.of(22, 57))) {
-            planes23 += 1;
-        } else if (plane.getDate().toLocalTime().isBefore(LocalTime.of(5, 45))) {
-            planes0 += 1;
+        lessThanThirtyFlights = total < 30;
+        if (flight.getDate().toLocalTime().isAfter(LocalTime.of(22, 57))) {
+            flights23 += 1;
+        } else if (flight.getDate().toLocalTime().isBefore(LocalTime.of(5, 45))) {
+            flights0 += 1;
         }
-        int altitude = plane.getAltitude();
+        int altitude = flight.getAltitude();
         if (altitude != 0) {
             absAltitude += altitude;
             avgAltitude = absAltitude / total;
         }
-        int speed = plane.getSpeed();
+        int speed = flight.getSpeed();
         if (speed != 0) {
             absSpeed += speed;
             avgSpeed = absSpeed / total;
         }
-        hoursPlane[plane.getDate().getHour()] += 1;
-        plane.setDay(this);
-        planes.add(plane);
+        hoursFlight[flight.getDate().getHour()] += 1;
+        flight.setDay(this);
+        flights.add(flight);
     }
 
     public void addWind(Wind wind) {
@@ -106,7 +106,7 @@ public class Day {
         hoursWind[wind.getDate().getHour()] = wind.getDeg();
     }
 
-    public void clearPlanes() {
-        this.planes.clear();
+    public void clearFlights() {
+        this.flights.clear();
     }
 }

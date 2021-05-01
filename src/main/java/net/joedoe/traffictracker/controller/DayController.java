@@ -1,56 +1,49 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.hateoas.DayAssembler;
 import net.joedoe.traffictracker.dto.DayDto;
-import net.joedoe.traffictracker.mapper.DayMapper;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.service.DayService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/planes/day")
+@RequestMapping("/api/days")
 public class DayController {
     private final DayService service;
-    private final DayMapper mapper;
+    private final DayAssembler assembler;
 
-    public DayController(DayService service, DayMapper mapper) {
+    public DayController(DayService service, DayAssembler assembler) {
         this.service = service;
-        this.mapper = mapper;
+        this.assembler = assembler;
     }
 
-    @GetMapping()
-    public DayDto getCurrentDay() {
-        Day day = service.getDay(LocalDate.now());
-        return mapper.toResource(day);
+    @GetMapping("/current")
+    public EntityModel<DayDto> getCurrentDay() {
+        DayDto day = service.getDayByDate(LocalDate.now());
+        return assembler.toModel(day);
     }
 
     @GetMapping("/{date}")
-    public DayDto getDayByDate(@PathVariable("date")
-                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-        return mapper.toResource(service.getDay(date));
+    public EntityModel<DayDto> getDayByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        DayDto day = service.getDayByDate(date);
+        return assembler.toModel(day);
+
     }
 
-    @GetMapping("/id/{id}")
-    public DayDto getDayById(@PathVariable("id") Long id) {
-        if (id == null) {
-            return null;
-        }
-        return mapper.toResource(service.getDayById(id));
-    }
-
+    @ApiIgnore
     @GetMapping("/all")
-    public List<DayDto> findAll() {
-        return mapper.toResources(service.findAll());
+    public List<Day> findAll() {
+        return service.findAll();
     }
 }

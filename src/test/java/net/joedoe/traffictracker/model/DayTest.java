@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.model;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.PlanesInit;
+import net.joedoe.traffictracker.bootstrap.FlightsInit;
 import net.joedoe.traffictracker.bootstrap.WindsInit;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,68 +25,68 @@ public class DayTest {
     }
 
     @Test
-    public void addPlane() {
-        Plane plane = PlanesInit.createPlane(day);
+    public void addFlight() {
+        Flight flight = FlightsInit.createFlight(day);
 
-        day.addPlane(plane);
+        day.addFlight(flight);
 
         assertEquals(1, day.getTotal());
-        assertTrue(day.isLessThanThirtyPlanes());
-        assertEquals(plane.getDate().getHour() == 23 ? 1 : 0, day.getPlanes23());
-        assertEquals(plane.getDate().toLocalTime().isBefore(LocalTime.of(5, 45)) ? 1 : 0, day.getPlanes0());
-        assertEquals(plane.getAltitude(), day.getAvgAltitude());
-        assertEquals(plane.getSpeed(), day.getAvgSpeed());
-        int[] hoursPlane = new int[24];
-        hoursPlane[plane.getDate().getHour()] = 1;
-        assertArrayEquals(hoursPlane, day.getHoursPlane());
-        assertEquals(1, day.getPlanes().size());
-        assertEquals(plane.getAltitude(), day.getAbsAltitude());
-        assertEquals(plane.getSpeed(), day.getAbsSpeed());
+        assertTrue(day.isLessThanThirtyFlights());
+        assertEquals(flight.getDate().getHour() == 23 ? 1 : 0, day.getFlights23());
+        assertEquals(flight.getDate().toLocalTime().isBefore(LocalTime.of(5, 45)) ? 1 : 0, day.getFlights0());
+        assertEquals(flight.getAltitude(), day.getAvgAltitude());
+        assertEquals(flight.getSpeed(), day.getAvgSpeed());
+        int[] hoursFlight = new int[24];
+        hoursFlight[flight.getDate().getHour()] = 1;
+        assertArrayEquals(hoursFlight, day.getHoursFlight());
+        assertEquals(1, day.getFlights().size());
+        assertEquals(flight.getAltitude(), day.getAbsAltitude());
+        assertEquals(flight.getSpeed(), day.getAbsSpeed());
     }
 
     @Test
-    public void addPlaneAfter23() {
-        Plane plane = PlanesInit.createPlane(day, LocalDateTime.now().withHour(23));
+    public void addFlightAfter23() {
+        Flight flight = FlightsInit.createFlight(day, LocalDateTime.now().withHour(23));
 
-        day.addPlane(plane);
+        day.addFlight(flight);
 
-        assertEquals(1, day.getPlanes23());
+        assertEquals(1, day.getFlights23());
     }
 
     @Test
-    public void addPlaneAfter0() {
-        Plane plane = PlanesInit.createPlane(day, LocalDateTime.now().withHour(1));
+    public void addFlightAfter0() {
+        Flight flight = FlightsInit.createFlight(day, LocalDateTime.now().withHour(1));
 
-        day.addPlane(plane);
+        day.addFlight(flight);
 
-        assertEquals(1, day.getPlanes0());
+        assertEquals(1, day.getFlights0());
     }
 
     @Test
-    public void addPlanes() {
+    public void addFlights() {
         System.out.println(day);
-        List<Plane> planes = PlanesInit.createPlanes();
+        List<Flight> flights = FlightsInit.createFlights();
 
-        for (Plane plane : planes)
-            day.addPlane(plane);
+        for (Flight flight : flights)
+            day.addFlight(flight);
         System.out.println(day);
 
-        assertEquals(planes.size(), day.getTotal());
-        assertFalse(day.isLessThanThirtyPlanes());
+        assertEquals(flights.size(), day.getTotal());
+        assertFalse(day.isLessThanThirtyFlights());
 
-        assertEquals(planes.stream().filter(p -> p.getDate().toLocalTime().isAfter(LocalTime.of(22, 57))).count(), day.getPlanes23());
-        assertEquals(planes.stream().filter(p -> p.getDate().toLocalTime().isBefore(LocalTime.of(5, 45))).count(), day.getPlanes0());
-        assertEquals(planes.stream().mapToInt(Plane::getAltitude).sum() / planes.size(), day.getAvgAltitude());
-        assertEquals(planes.stream().mapToInt(Plane::getSpeed).sum() / planes.size(), day.getAvgSpeed());
-        int[] hoursPlane = new int[24];
-        for (Plane plane : planes)
-            hoursPlane[plane.getDate().getHour()] += 1;
+        assertEquals(flights.stream().filter(p -> p.getDate().toLocalTime().isAfter(LocalTime.of(22, 57))).count(), day.getFlights23());
+        assertEquals(flights.stream().filter(p -> p.getDate().toLocalTime().isBefore(LocalTime.of(5, 45))).count(), day.getFlights0());
+        assertEquals(flights.stream().mapToInt(Flight::getAltitude).sum() / flights.size(), day.getAvgAltitude());
+        assertEquals(flights.stream().mapToInt(Flight::getSpeed).sum() / flights.size(), day.getAvgSpeed());
+        int[] hoursFlight = new int[24];
+        for (Flight flight : flights)
+            hoursFlight[flight.getDate().getHour()] += 1;
         for (int i = 0; i < 24; i++)
-            log.info(i + ": " + hoursPlane[i] + " " + day.getHoursPlane()[i]);
-        assertArrayEquals(hoursPlane, day.getHoursPlane());
-        assertEquals(planes.size(), day.getPlanes().size());
-        assertEquals(planes.stream().mapToInt(Plane::getAltitude).sum(), day.getAbsAltitude());
-        assertEquals(planes.stream().mapToInt(Plane::getSpeed).sum(), day.getAbsSpeed());
+            log.info(i + ": " + hoursFlight[i] + " " + day.getHoursFlight()[i]);
+        assertArrayEquals(hoursFlight, day.getHoursFlight());
+        assertEquals(flights.size(), day.getFlights().size());
+        assertEquals(flights.stream().mapToInt(Flight::getAltitude).sum(), day.getAbsAltitude());
+        assertEquals(flights.stream().mapToInt(Flight::getSpeed).sum(), day.getAbsSpeed());
     }
 
     @Test

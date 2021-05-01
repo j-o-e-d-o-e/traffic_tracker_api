@@ -9,11 +9,10 @@ import net.joedoe.traffictracker.model.ForecastDay;
 import net.joedoe.traffictracker.model.ForecastScore;
 import net.joedoe.traffictracker.repo.ForecastRepository;
 import net.joedoe.traffictracker.repo.ForecastScoreRepository;
-import net.joedoe.traffictracker.utils.PropertiesHandler;
+import net.joedoe.traffictracker.util.PropertiesHandler;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 @PropertySource("classpath:locale.properties")

@@ -2,9 +2,11 @@ package net.joedoe.traffictracker.controller;
 
 import net.joedoe.traffictracker.bootstrap.DaysInit;
 import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.hateoas.MonthAssembler;
 import net.joedoe.traffictracker.mapper.MonthMapper;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.MonthService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -25,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class MonthControllerTest {
     @Mock
-    private DayService service;
+    private MonthService service;
     private MockMvc mockMvc;
     private final LocalDate date = LocalDate.now().withDayOfMonth(1);
     private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfMonth() - 1);
@@ -33,7 +35,7 @@ public class MonthControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        MonthController controller = new MonthController(service, new MonthMapper());
+        MonthController controller = new MonthController(service, new MonthAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
     }
@@ -42,9 +44,9 @@ public class MonthControllerTest {
     public void getCurrentMonth() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getMonth(date)).thenReturn(days);
+        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days));
 
-        mockMvc.perform(get("/planes/month")
+        mockMvc.perform(get("/api/months/current")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(total)))
@@ -55,10 +57,10 @@ public class MonthControllerTest {
     public void getMonthByDate() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getMonth(date)).thenReturn(days);
+        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days));
 
-        System.out.println("/planes/month/" + date.getYear() + "/" + date.getMonthValue());
-        mockMvc.perform(get("/planes/month/" + date.getYear() + "/" + date.getMonthValue())
+        System.out.println("/api/months/" + date.getYear() + "/" + date.getMonthValue());
+        mockMvc.perform(get("/api/months/" + date.getYear() + "/" + date.getMonthValue())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(total)))

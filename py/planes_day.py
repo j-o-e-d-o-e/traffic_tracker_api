@@ -5,7 +5,7 @@ import sys
 
 import test_data
 
-URL = 'http://traffic-tracker.herokuapp.com/planes/day'
+URL = 'http://traffic-tracker.herokuapp.com/api/days'
 HOURS = 24
 
 
@@ -13,7 +13,7 @@ def main():
     url = URL
     if len(sys.argv) > 1:
         url += '/' + sys.argv[1]
-    date, total, avg_altitude, avg_speed, wind_speed, hours_plane, avg_planes, hours_wind = fetch(url)
+    date, total, avg_altitude, avg_speed, wind_speed, hours_flight, avg_flights, hours_wind = fetch(url)
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.grid()
@@ -34,13 +34,13 @@ def main():
     plt.xticks(x_axis, hours)
     plt.gcf().autofmt_xdate()
 
-    text_planes, text_weather = set_texts(total, avg_altitude, avg_speed, wind_speed)
-    plt.gcf().text(0.12, 0.9, text_planes, fontweight="bold")
+    text_flights, text_weather = set_texts(total, avg_altitude, avg_speed, wind_speed)
+    plt.gcf().text(0.12, 0.9, text_flights, fontweight="bold")
     plt.gcf().text(0.24, 0.9, text_weather, fontweight="bold")
 
-    ax1.set_ylabel('Planes')
-    line1, = ax1.plot(x_axis, hours_plane)
-    line2, = ax1.plot(x_axis, avg_planes, linestyle="--", color="orange")
+    ax1.set_ylabel('Flights')
+    line1, = ax1.plot(x_axis, hours_flight)
+    line2, = ax1.plot(x_axis, avg_flights, linestyle="--", color="orange")
 
     ax2.set_ylabel('Wind direction')
     line3, = ax2.plot(x_axis, hours_wind, linestyle=":", color="r")
@@ -54,25 +54,25 @@ def fetch(url):
     # response = test_data.oct_10
     response = requests.get(url).json()
     print(response)
-    hours_plane = [None] * HOURS
-    for i, hour_plane in enumerate(response['hours_plane']):
-        hours_plane[i] = hour_plane
-    avg_planes = [None] * HOURS
-    for i, avg_plane in enumerate(response['avg_planes']):
-        avg_planes[i] = avg_plane
+    hours_flight = [None] * HOURS
+    for i, hour_flight in enumerate(response['hours_flight']):
+        hours_flight[i] = hour_flight
+    avg_flights = [None] * HOURS
+    for i, avg_flight in enumerate(response['avg_flights']):
+        avg_flights[i] = avg_flight
     hours_wind = [None] * HOURS
     for i, hour_wind in enumerate(response['hours_wind']):
         hours_wind[i] = hour_wind
     return datetime.strptime(response['date'], '%Y-%m-%d'), int(response['total']), response['avg_altitude'], response[
-        'avg_speed'], response['wind_speed'], hours_plane, avg_planes, hours_wind
+        'avg_speed'], response['wind_speed'], hours_flight, avg_flights, hours_wind
 
 
 def set_texts(total, avg_altitude, avg_speed, wind_speed):
-    text_planes = "Planes total: " + "{:,}".format(total) \
+    text_flights = "Flights total: " + "{:,}".format(total) \
                   + "\nAvg altitude: " + "{:,}".format(avg_altitude) + " m" \
                   + "\nAvg speed: " + "{:,}".format(avg_speed) + " km/h"
     text_weather = "\nWind speed: " + "{:,}".format(wind_speed) + " km/h"
-    return text_planes, text_weather
+    return text_flights, text_weather
 
 
 if __name__ == "__main__":

@@ -2,9 +2,10 @@ package net.joedoe.traffictracker.controller;
 
 import net.joedoe.traffictracker.bootstrap.DaysInit;
 import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.hateoas.WeekAssembler;
 import net.joedoe.traffictracker.mapper.WeekMapper;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.WeekService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class WeekControllerTest {
     @Mock
-    private DayService service;
+    private WeekService service;
     private MockMvc mockMvc;
     private final LocalDate date = LocalDate.now().with(DayOfWeek.MONDAY);
     private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
@@ -35,7 +36,7 @@ public class WeekControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        WeekController controller = new WeekController(service, new WeekMapper());
+        WeekController controller = new WeekController(service, new WeekAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
     }
@@ -44,9 +45,9 @@ public class WeekControllerTest {
     public void getCurrentWeek() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getWeek(date)).thenReturn(days);
+        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days));
 
-        mockMvc.perform(get("/planes/week")
+        mockMvc.perform(get("/api/weeks/current")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(total)))
@@ -57,10 +58,10 @@ public class WeekControllerTest {
     public void getWeekByDate() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getWeek(date)).thenReturn(days);
+        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days));
 
         String dateFormat = DateTimeFormatter.ISO_DATE.format(date);
-        mockMvc.perform(get("/planes/week/" + dateFormat)
+        mockMvc.perform(get("/api/weeks/" + dateFormat)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(total)))

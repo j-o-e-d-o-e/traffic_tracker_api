@@ -16,25 +16,18 @@ import static org.junit.Assert.*;
 
 @Slf4j
 public class StatsMapperTest {
-    private StatsMapper mapper;
-    private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfYear() - 1);
-
-    @Before
-    public void setUp() {
-        DayMapper dayMapper = new DayMapper();
-        mapper = new StatsMapper(dayMapper, new PlaneMapper());
-    }
 
     @Test
     public void iterateDays() {
+        List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfYear() - 1);
         int total = days.stream().mapToInt(Day::getTotal).sum();
         int dayWithMostFlights = Collections.max(days, Comparator.comparing(Day::getTotal)).getTotal();
-        StatsDto act = mapper.toStatsDto(days, null);
+        StatsDto act = StatsMapper.toStatsDto(days, null);
 
         assertEquals(total, act.getTotal());
         assertEquals(dayWithMostFlights, act.getDay_with_most_flights().getStats());
-        log.info("" + act.getAirlines());
-        log.info(String.valueOf(act.getDays_with_less_than_thirty_flights()));
-        log.info(String.valueOf(act.getHours_with_no_flights()));
+//        log.info("" + act.getAirlines());
+//        log.info(String.valueOf(act.getDays_with_less_than_thirty_flights()));
+//        log.info(String.valueOf(act.getHours_with_no_flights()));
     }
 }

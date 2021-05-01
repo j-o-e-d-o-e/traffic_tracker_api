@@ -45,7 +45,7 @@ public class ForecastControllerTest {
         List<ForecastDay> days = ForecastsInit.createDays();
 
         when(service.findAll()).thenReturn(days);
-        mockMvc.perform(get("/planes/forecasts")
+        mockMvc.perform(get("/api/forecasts")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].probability", closeTo(days.get(0).getProbability(), 0.1f)))
@@ -57,7 +57,7 @@ public class ForecastControllerTest {
         ForecastScore score = ForecastsInit.createScore();
 
         when(scoreService.find()).thenReturn(score);
-        mockMvc.perform(get("/planes/forecasts/score")
+        mockMvc.perform(get("/api/forecasts/score")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.precision", closeTo(score.getPrecision(), 0.1f)))

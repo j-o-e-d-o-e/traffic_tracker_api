@@ -1,11 +1,13 @@
 package net.joedoe.traffictracker.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.exception.ResourceNotFoundException;
+import net.joedoe.traffictracker.dto.DayDto;
+import net.joedoe.traffictracker.exception.NotFoundException;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.model.Plane;
+import net.joedoe.traffictracker.model.Flight;
 import net.joedoe.traffictracker.model.Wind;
 import net.joedoe.traffictracker.repo.DayRepository;
+import net.joedoe.traffictracker.mapper.DayMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,15 +39,15 @@ public class DayService {
         repository.save(new Day(now));
         Day dayBefore = repository.getDayByDate(now.minusDays(30)).orElse(null);
         if (dayBefore != null) {
-            dayBefore.clearPlanes();
+            dayBefore.clearFlights();
             repository.save(dayBefore);
         }
     }
 
-    public void addPlane(Plane plane) {
-        Day currentDay = repository.getDayByDate(plane.getDate().toLocalDate()).orElse(null);
+    public void addFlight(Flight flight) {
+        Day currentDay = repository.getDayByDate(flight.getDate().toLocalDate()).orElse(null);
         if (currentDay != null) {
-            currentDay.addPlane(plane);
+            currentDay.addFlight(flight);
             repository.save(currentDay);
         }
     }
@@ -58,24 +60,12 @@ public class DayService {
         }
     }
 
-    public Day getDayById(Long id) {
-        return repository.getDayById(id).orElseThrow(ResourceNotFoundException::new);
-    }
-
-    public Day getDay(LocalDate date) {
-        return repository.getDayByDate(date).orElseThrow(ResourceNotFoundException::new);
-    }
-
-    public List<Day> getWeek(LocalDate date) {
-        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1)).orElseThrow(ResourceNotFoundException::new);
-    }
-
-    public List<Day> getMonth(LocalDate date) {
-        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1)).orElseThrow(ResourceNotFoundException::new);
-    }
-
-    public List<Day> getYear(LocalDate date) {
-        return repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1)).orElseThrow(ResourceNotFoundException::new);
+    public DayDto getDayByDate(LocalDate date) {
+        Optional<Day> day = repository.getDayByDate(date);
+        if (!day.isPresent()) {
+            throw new NotFoundException("Could not find day " + date);
+        }
+        return DayMapper.toDto(day.get());
     }
 
     public List<Day> findAll() {
@@ -88,20 +78,20 @@ public class DayService {
             return;
         int departuresContinental = 0, departuresInternational = 0, departuresNational = 0, departuresUnknown = 0;
         Map<String, Integer> airportsOccurrences = new HashMap<>();
-        for (Plane plane : day.getPlanes()) {
-            if (plane.getDepartureAirport() == null) {
+        for (Flight flight : day.getFlights()) {
+            if (flight.getDepartureAirport() == null) {
                 departuresUnknown++;
             } else {
-                if (plane.getDepartureAirport().startsWith(prefix)) {
+                if (flight.getDepartureAirport().startsWith(prefix)) {
                     departuresNational++;
                 } else {
-                    if (plane.getDepartureAirport().startsWith(prefix1) || plane.getDepartureAirport().startsWith(prefix2)) {
+                    if (flight.getDepartureAirport().startsWith(prefix1) || flight.getDepartureAirport().startsWith(prefix2)) {
                         departuresInternational++;
                     } else {
                         departuresContinental++;
                     }
                 }
-                String departure = plane.getDepartureAirportName() != null ? plane.getDepartureAirportName() : plane.getDepartureAirport();
+                String departure = flight.getDepartureAirportName() != null ? flight.getDepartureAirportName() : flight.getDepartureAirport();
                 if (airportsOccurrences.containsKey(departure)) {
                     airportsOccurrences.put(departure, airportsOccurrences.get(departure) + 1);
                 } else {

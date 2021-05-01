@@ -10,12 +10,14 @@ import net.joedoe.traffictracker.service.ForecastService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 @Slf4j
+@ApiIgnore
 @RestController
-@RequestMapping("/planes/forecasts")
+@RequestMapping("/api/forecasts")
 public class ForecastController {
     private final ForecastService service;
     private final ForecastScoreService scoreService;

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ForecastScoreService {
-    private ForecastScoreRepository repository;
+    private final ForecastScoreRepository repository;
 
     public ForecastScoreService(ForecastScoreRepository repository) {
         this.repository = repository;

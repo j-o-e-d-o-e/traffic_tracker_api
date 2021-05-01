@@ -1,10 +1,11 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.hateoas.WeekAssembler;
 import net.joedoe.traffictracker.dto.WeekDto;
-import net.joedoe.traffictracker.mapper.WeekMapper;
-import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.WeekService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,29 +16,25 @@ import java.time.LocalDate;
 
 @Slf4j
 @RestController
-@RequestMapping("/planes/week")
+@RequestMapping("/api/weeks")
 public class WeekController {
-    private final DayService service;
-    private final WeekMapper mapper;
+    private final WeekService service;
+    private final WeekAssembler assembler;
 
-    public WeekController(DayService service, WeekMapper mapper) {
+    public WeekController(WeekService service, WeekAssembler assembler) {
         this.service = service;
-        this.mapper = mapper;
+        this.assembler = assembler;
     }
 
-    @GetMapping()
-    public WeekDto getCurrentWeek() {
-        LocalDate date = LocalDate.now().with(DayOfWeek.MONDAY);
-        return mapper.toResource(service.getWeek(date));
+    @GetMapping("/current")
+    public EntityModel<?> getCurrentWeek() {
+        WeekDto week = service.getWeek(LocalDate.now().with(DayOfWeek.MONDAY));
+        return assembler.toModel(week);
     }
 
     @GetMapping("/{date}")
-    public WeekDto getWeekByDate(@PathVariable("date")
-                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-        date = date.with(DayOfWeek.MONDAY);
-        return mapper.toResource(service.getWeek(date));
+    public EntityModel<?> getWeekByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        WeekDto week = service.getWeek(date.with(DayOfWeek.MONDAY));
+        return assembler.toModel(week);
     }
 }

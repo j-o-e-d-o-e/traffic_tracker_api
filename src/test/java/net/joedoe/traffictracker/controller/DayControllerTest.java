@@ -3,6 +3,7 @@ package net.joedoe.traffictracker.controller;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.DaysInit;
 import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.hateoas.DayAssembler;
 import net.joedoe.traffictracker.mapper.DayMapper;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.service.DayService;
@@ -35,7 +36,7 @@ public class DayControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        DayController controller = new DayController(service, new DayMapper());
+        DayController controller = new DayController(service, new DayAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
     }
@@ -44,8 +45,8 @@ public class DayControllerTest {
     public void getCurrentDay() throws Exception {
         Day day = DaysInit.createDay(LocalDate.now());
 
-        when(service.getDay(date)).thenReturn(day);
-        mockMvc.perform(get("/planes/day")
+        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
+        mockMvc.perform(get("/api/days/current")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(day.getTotal())))
@@ -56,28 +57,14 @@ public class DayControllerTest {
     public void getDayByDate() throws Exception {
         Day day = DaysInit.createDay(LocalDate.now().minusDays(1));
 
-        when(service.getDay(date)).thenReturn(day);
+        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
 
         String dateFormat = DateTimeFormatter.ISO_DATE.format(date);
-        mockMvc.perform(get("/planes/day/" + dateFormat)
+        mockMvc.perform(get("/api/days/" + dateFormat)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total", equalTo(day.getTotal())))
-                .andExpect(jsonPath("$.hours_plane", hasSize(24)))
-                .andExpect(jsonPath("$.hours_wind", hasSize(24)));
-    }
-
-    @Test
-    public void getDayById() throws Exception {
-        Day day = DaysInit.createDay(LocalDate.now().minusDays(1));
-
-        when(service.getDayById(day.getId())).thenReturn(day);
-
-        mockMvc.perform(get("/planes/day/id/" + day.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total", equalTo(day.getTotal())))
-                .andExpect(jsonPath("$.hours_plane", hasSize(24)))
+                .andExpect(jsonPath("$.hours_flight", hasSize(24)))
                 .andExpect(jsonPath("$.hours_wind", hasSize(24)));
     }
 }

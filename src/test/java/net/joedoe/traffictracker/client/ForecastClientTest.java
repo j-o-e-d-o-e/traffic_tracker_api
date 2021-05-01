@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+@Ignore("To avoid remote call to my heroku-django-api")
 public class ForecastClientTest {
     @Mock
     private ForecastRepository repository;
@@ -21,13 +22,11 @@ public class ForecastClientTest {
         client = new ForecastClient(repository, scoreRepository);
     }
 
-    @Ignore
     @Test
     public void predict() {
         client.predict();
     }
 
-    @Ignore
     @Test
     public void score() {
         client.score();

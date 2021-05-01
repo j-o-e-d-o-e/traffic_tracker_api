@@ -12,12 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 public class MapData {
-    private List<CurrentPlane> planes;
+    private List<CurrentFlight> flights;
     private boolean updated;
 
     @Data
     @AllArgsConstructor
-    public static class CurrentPlane {
+    public static class CurrentFlight {
         private LocalDateTime date;
         private String icao;
         private int altitude;
@@ -26,11 +26,11 @@ public class MapData {
         private double latitude;
         private boolean updated;
 
-        public CurrentPlane(Plane plane, double longitude, double latitude) {
-            this.date = plane.getDate();
-            this.icao = plane.getIcao();
-            this.altitude = plane.getAltitude();
-            this.speed = plane.getSpeed();
+        public CurrentFlight(Flight flight, double longitude, double latitude) {
+            this.date = flight.getDate();
+            this.icao = flight.getIcao();
+            this.altitude = flight.getAltitude();
+            this.speed = flight.getSpeed();
             this.longitude = longitude;
             this.latitude = latitude;
             this.updated = true;
