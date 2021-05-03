@@ -7,8 +7,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@Order(3)
+//@Component
+//@Order(3)
 public class ForecastInit implements CommandLineRunner {
     private final ForecastClient client;
 

@@ -1,6 +1,6 @@
 # traffic_tracker_api
 
-Rest api for tracking planes in a specified area including swagger and hateoas. Published on [heroku](https://traffic-tracker.herokuapp.com/swagger-ui.html).
+Rest api for tracking planes in a specified area including swagger and hateoas. Published on [heroku](https://traffic-tracker.herokuapp.com/swagger-ui/index.html).
 Integrates with [machine learning model](https://github.com/j-o-e-d-o-e/py_traffic_tracker-forecasts) forecasting whether planes are going to fly based on wind direction.
 
 ## Live client
