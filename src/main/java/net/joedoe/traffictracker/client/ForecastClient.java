@@ -42,7 +42,7 @@ public class ForecastClient {
                 .build();
         this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            this.url = PropertiesHandler.getProperties("src/main/resources/forecast.properties").getProperty("url.forecast");
+            this.url = PropertiesHandler.getProperties("src/main/resources/forecast.properties").getProperty("url-forecast");
         } catch (IOException e) {
             e.printStackTrace();
         }

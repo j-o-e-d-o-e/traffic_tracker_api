@@ -1,6 +1,6 @@
 package net.joedoe.traffictracker.service;
 
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.repo.DayRepository;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class WeekServiceTest {
@@ -26,13 +26,13 @@ public class WeekServiceTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void getWeek() {
         LocalDate date = LocalDate.now().with(DayOfWeek.MONDAY);
-        List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
+        List<Day> days = DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
 
         when(repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1))).thenReturn(Optional.of(days));
         WeekDto week = service.getWeek(date);

@@ -1,8 +1,8 @@
 package net.joedoe.traffictracker.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.DayDto;
+import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.MapEntryDto;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.util.PropertiesHandler;
@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,7 +24,7 @@ public class DayMapper {
 
     static {
         try {
-            DayMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("startDate"));
+            DayMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("start-date"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,6 +32,7 @@ public class DayMapper {
 
     public static DayDto toDto(Day day) {
         DayDto dayDto = new DayDto();
+        dayDto.setId(day.getId());
         dayDto.setDate(day.getDate());
         dayDto.setNow(LocalDateTime.now());
         dayDto.setWeekday(dayDto.getDate().getDayOfWeek().name());
@@ -44,7 +48,7 @@ public class DayMapper {
         dayDto.setHours_wind(getHoursWind(day));
         dayDto.setDepartures(getDepartures(day));
         dayDto.setAirports(getAirportDtos(day));
-        dayDto.setFlights(!day.getFlights().isEmpty());
+        dayDto.setFlights(day.getTotal() != 0);
         return dayDto;
     }
 

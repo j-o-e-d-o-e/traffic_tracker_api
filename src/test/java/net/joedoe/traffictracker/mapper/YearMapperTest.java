@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.model.Day;
 import org.junit.Test;
@@ -10,12 +10,13 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class YearMapperTest {
     private final LocalDate startDate = LocalDate.now().withDayOfMonth(1).withMonth(1);
-    private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfYear() - 1);
+    private final List<Day> days = DaysInitTest.createDays(LocalDate.now().getDayOfYear() - 1);
 
     @Test
     public void toDto() {

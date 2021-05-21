@@ -1,6 +1,6 @@
 package net.joedoe.traffictracker.hateoas;
 
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.mapper.WeekMapper;
 import org.junit.Test;
@@ -9,7 +9,8 @@ import org.springframework.hateoas.EntityModel;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class WeekAssemblerTest {
     private final WeekAssembler assembler = new WeekAssembler();
@@ -17,7 +18,7 @@ public class WeekAssemblerTest {
 
     @Test
     public void toModel(){
-        WeekDto week = WeekMapper.toDto(startDate, DaysInit.createDays(LocalDate.now().getDayOfWeek().getValue() - 1));
+        WeekDto week = WeekMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1));
 
         EntityModel<WeekDto> weekDto = assembler.toModel(week);
 

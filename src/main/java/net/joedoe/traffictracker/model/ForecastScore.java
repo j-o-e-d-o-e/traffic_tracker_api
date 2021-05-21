@@ -13,13 +13,10 @@ public class ForecastScore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
     private float precision;
-    @Column
     @JsonProperty("mean_abs_error")
     private float meanAbsoluteError;
     @SuppressWarnings("JpaAttributeTypeInspection")
-    @Column
     @JsonProperty("confusion_matrix")
     private int[][] confusionMatrix;
 }

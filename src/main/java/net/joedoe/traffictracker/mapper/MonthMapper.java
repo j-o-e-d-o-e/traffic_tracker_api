@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -21,7 +24,7 @@ public class MonthMapper {
     static {
         try {
             MonthMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties")
-                    .getProperty("startDate"));
+                    .getProperty("start-date"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +63,7 @@ public class MonthMapper {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         monthDto.setTotal(total);
-        monthDto.setAvg_flights(getAvgFlights(date, days, total));
+        monthDto.setAvg_flights(getAvgFlights(date, days.size(), total));
         monthDto.setFlights_23(flights23);
         monthDto.setFlights_0(flights0);
         if (total != 0) {
@@ -76,13 +79,13 @@ public class MonthMapper {
     }
 
     @NotNull
-    private static Integer[] getAvgFlights(LocalDate date, List<Day> days, int total) {
+    private static Integer[] getAvgFlights(LocalDate date, int daysSize, int total) {
         Integer[] avgFlights;
         // Sept 2019
         if (date.getYear() == MonthMapper.date.getYear() && date.getMonth().equals(MonthMapper.date.getMonth())) {
             avgFlights = new Integer[MonthMapper.date.getMonth().length(MonthMapper.date.isLeapYear())];
             Arrays.fill(avgFlights, 0, MonthMapper.date.getDayOfMonth() - 1, null);
-            Arrays.fill(avgFlights, MonthMapper.date.getDayOfMonth() - 1, avgFlights.length, total / days.size());
+            Arrays.fill(avgFlights, MonthMapper.date.getDayOfMonth() - 1, avgFlights.length, total / daysSize);
         } else {
             LocalDate now = LocalDate.now();
             if (now.getYear() == date.getYear() && now.getMonth().equals(date.getMonth())) { // current month
@@ -90,7 +93,7 @@ public class MonthMapper {
             } else { // earlier month (but not Sept 2019)
                 avgFlights = new Integer[date.getMonth().length(date.isLeapYear())];
             }
-            Arrays.fill(avgFlights, total / days.size());
+            Arrays.fill(avgFlights, total / daysSize);
         }
         return avgFlights;
     }

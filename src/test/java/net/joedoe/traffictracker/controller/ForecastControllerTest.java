@@ -1,8 +1,8 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.ForecastsInit;
-import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.bootstrap.ForecastsInitTest;
+import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.model.ForecastDay;
 import net.joedoe.traffictracker.model.ForecastScore;
 import net.joedoe.traffictracker.service.ForecastScoreService;
@@ -17,7 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,15 +35,15 @@ public class ForecastControllerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         ForecastController controller = new ForecastController(service, scoreService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
+                .setControllerAdvice(new NotFoundExceptionHandler()).build();
     }
 
     @Test
     public void getAll() throws Exception {
-        List<ForecastDay> days = ForecastsInit.createDays();
+        List<ForecastDay> days = ForecastsInitTest.createDays();
 
         when(service.findAll()).thenReturn(days);
         mockMvc.perform(get("/api/forecasts")
@@ -54,7 +55,7 @@ public class ForecastControllerTest {
 
     @Test
     public void getScore() throws Exception {
-        ForecastScore score = ForecastsInit.createScore();
+        ForecastScore score = ForecastsInitTest.createScore();
 
         when(scoreService.find()).thenReturn(score);
         mockMvc.perform(get("/api/forecasts/score")

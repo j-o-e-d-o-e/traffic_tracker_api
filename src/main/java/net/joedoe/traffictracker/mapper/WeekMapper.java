@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -20,7 +23,7 @@ public class WeekMapper {
 
     static {
         try {
-            WeekMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("startDate"));
+            WeekMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("start-date"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,7 +55,7 @@ public class WeekMapper {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         weekDto.setTotal(total);
-        weekDto.setAvg_flights(getAvgFlights(date, days, total));
+        weekDto.setAvg_flights(getAvgFlights(date, days.size(), total));
         weekDto.setFlights_23(flights23);
         weekDto.setFlights_0(flights0);
         if (total != 0) {
@@ -66,14 +69,14 @@ public class WeekMapper {
     }
 
     @NotNull
-    private static int[] getAvgFlights(LocalDate date, List<Day> days, int total) {
+    private static int[] getAvgFlights(LocalDate date, int daysSize, int total) {
         int[] avgFlights;
         if (LocalDate.now().isBefore(date.plusDays(7))) { // current week
             avgFlights = new int[LocalDate.now().getDayOfWeek().getValue()];
         } else {
             avgFlights = new int[7];
         }
-        Arrays.fill(avgFlights, total / days.size());
+        Arrays.fill(avgFlights, total / daysSize);
         return avgFlights;
     }
 }

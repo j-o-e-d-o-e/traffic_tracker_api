@@ -9,13 +9,18 @@ import net.joedoe.traffictracker.model.Flight;
 import net.joedoe.traffictracker.service.DayService;
 import net.joedoe.traffictracker.service.FlightService;
 import net.joedoe.traffictracker.util.PropertiesHandler;
-import okhttp3.*;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @PropertySource("classpath:locale.properties")
@@ -27,7 +32,6 @@ public class DepartureClient {
     public String url;
     public String arrivalAirport;
     public String timezone;
-    private Properties departureAirports;
     private final OkHttpClient client;
     private int fails = 0;
 
@@ -37,11 +41,10 @@ public class DepartureClient {
         this.client = new OkHttpClient();
         this.client.retryOnConnectionFailure();
         try {
-            Properties prop = PropertiesHandler.getProperties("src/main/resources/departureAirport.properties");
+            Properties prop = PropertiesHandler.getProperties("src/main/resources/departure.properties");
             this.url = prop.getProperty("url");
             this.arrivalAirport = prop.getProperty("airport");
             this.timezone = prop.getProperty("timezone");
-            this.departureAirports = PropertiesHandler.getProperties("src/main/resources/departureAirportsList.properties");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,26 +96,22 @@ public class DepartureClient {
 
     public void updateFlights(List<Departure> departures, LocalDate date) {
         log.info("Total fetched from api: " + departures.size());
-        List<Flight> flights = this.service.getFlightsListByDate(date);
+        List<Flight> flights = this.service.getByDate(date);
         log.info("Total fetched from db: " + flights.size());
         for (Departure departure : departures) {
-            if (departure.estDepartureAirport == null)
-                continue;
+            if (departure.estDepartureAirport == null) continue;
             LocalDateTime lastSeen = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(departure.lastSeen * 1000),
                     TimeZone.getTimeZone(timezone).toZoneId());
-            Optional<Flight> flight = flights.stream().filter(f -> f.getDepartureAirport() == null &&
-                    departure.icao24.equals(f.getIcao()) &&
-                    lastSeen.isBefore(f.getDate().plusMinutes(30)) &&
-                    lastSeen.isAfter(f.getDate().minusMinutes(30))
-            ).findFirst();
-            flight.ifPresent(p -> {
-                p.setDepartureAirport(departure.estDepartureAirport);
-                p.setDepartureAirportName(departureAirports.getProperty(departure.estDepartureAirport));
-                service.save(p);
-                log.info(p.toString());
-            });
+            Optional<Flight> flight = flights.stream().filter(f ->
+                    (f.getDeparture() == null || f.getDeparture().getIcao() == null) &&
+                            (f.getPlane() != null && f.getPlane().getIcao() != null) &&
+                            departure.icao24.equals(f.getPlane().getIcao()) &&
+                            lastSeen.isBefore(f.getDateTime().plusMinutes(30)) &&
+                            lastSeen.isAfter(f.getDateTime().minusMinutes(30))).findFirst();
+            flight.ifPresent(f -> service.setDeparture(departure.estDepartureAirport, f));
         }
+        log.info("Departures saved.");
     }
 
     @Setter

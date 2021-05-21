@@ -15,7 +15,7 @@ public class WindClientTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         client = new WindClient(service);
     }
 

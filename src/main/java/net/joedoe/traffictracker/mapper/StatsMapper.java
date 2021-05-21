@@ -6,9 +6,7 @@ import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.StatsDto;
 import net.joedoe.traffictracker.dto.StatsDto.StatsDay;
 import net.joedoe.traffictracker.dto.StatsDto.StatsPlane;
-import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.model.Flight;
-import net.joedoe.traffictracker.model.ForecastScore;
+import net.joedoe.traffictracker.model.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -58,16 +56,18 @@ public class StatsMapper {
                 DaysMapperUtil.incrementDepartures(day, departuresDto, airports);
             Map<String, Integer> planesDaily = new HashMap<>();
             for (Flight flight : day.getFlights()) {
+                Plane plane = flight.getPlane();
+                String icao = plane.getIcao();
                 // plane_with_most_flights
-                if (planes.containsKey(flight.getIcao()))
-                    planes.put(flight.getIcao(), planes.get(flight.getIcao()) + 1);
+                if (planes.containsKey(icao))
+                    planes.put(icao, planes.get(icao) + 1);
                 else
-                    planes.put(flight.getIcao(), 1);
+                    planes.put(icao, 1);
                 // plane_with_most_flights_within_one_day
-                if (planesDaily.containsKey(flight.getIcao()))
-                    planesDaily.put(flight.getIcao(), planesDaily.get(flight.getIcao()) + 1);
+                if (planesDaily.containsKey(icao))
+                    planesDaily.put(icao, planesDaily.get(icao) + 1);
                 else
-                    planesDaily.put(flight.getIcao(), 1);
+                    planesDaily.put(icao, 1);
                 // max_altitude
                 if (maxAltitude == null || flight.getAltitude() >= maxAltitude.getAltitude())
                     maxAltitude = flight;
@@ -81,14 +81,15 @@ public class StatsMapper {
                 else if (minSpeed == null || flight.getSpeed() <= minSpeed.getSpeed())
                     minSpeed = flight;
                 // airlines
-                String airline = flight.getAirlineName() == null ? flight.getAirline() : flight.getAirlineName();
-                if (airline == null) continue;
-                if (airlines.containsKey(airline))
-                    airlines.put(airline, airlines.get(airline) + 1);
+                Airline airline = flight.getAirline();
+                String airlineName = airline.getName() == null ? airline.getIcao() : airline.getName();
+                if (airlineName == null) continue;
+                if (airlines.containsKey(airlineName))
+                    airlines.put(airlineName, airlines.get(airlineName) + 1);
                 else
-                    airlines.put(airline, 1);
+                    airlines.put(airlineName, 1);
             }
-            // plane_with_most_flights_within_one_day
+//             plane_with_most_flights_within_one_day
             Map.Entry<String, Integer> plane = planesDaily.entrySet().stream().max(Map.Entry.comparingByValue()).orElse(null);
             if (plane != null && plane.getValue() >= planeWithMostFlightsWithinOneDay.getStats()) {
                 planeWithMostFlightsWithinOneDay.setDay(DayMapper.toDto(day));

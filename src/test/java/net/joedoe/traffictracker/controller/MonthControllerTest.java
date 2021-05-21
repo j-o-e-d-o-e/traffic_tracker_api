@@ -1,11 +1,10 @@
 package net.joedoe.traffictracker.controller;
 
-import net.joedoe.traffictracker.bootstrap.DaysInit;
-import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
+import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.hateoas.MonthAssembler;
 import net.joedoe.traffictracker.mapper.MonthMapper;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.service.DayService;
 import net.joedoe.traffictracker.service.MonthService;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,14 +29,14 @@ public class MonthControllerTest {
     private MonthService service;
     private MockMvc mockMvc;
     private final LocalDate date = LocalDate.now().withDayOfMonth(1);
-    private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfMonth() - 1);
+    private final List<Day> days = DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1);
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         MonthController controller = new MonthController(service, new MonthAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
+                .setControllerAdvice(new NotFoundExceptionHandler()).build();
     }
 
     @Test

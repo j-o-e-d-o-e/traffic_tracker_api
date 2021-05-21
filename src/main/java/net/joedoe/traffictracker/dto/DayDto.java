@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DayDto {
+    private Long id;
     private LocalDate date;
     private LocalDateTime now;
     private String weekday;

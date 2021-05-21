@@ -18,9 +18,7 @@ public class ForecastDay {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    @Column
     private LocalDate date;
-    @Column
     private float probability;
     @SuppressWarnings("JpaDataSourceORMInspection")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

@@ -24,7 +24,6 @@ public class StatsController {
     @GetMapping()
     public ResponseEntity<?> getStats() {
         StatsDto stats = service.getStats();
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(stats);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600 * 24, TimeUnit.SECONDS)).body(stats);
     }
 }
-

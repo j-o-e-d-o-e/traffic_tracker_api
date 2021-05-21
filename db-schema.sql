@@ -1,6 +1,9 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 drop table if exists flight;
 drop table if exists day;
+drop table if exists plane;
+drop table if exists airline;
+drop table if exists airport;
 
 create table day (
     id  bigserial not null,
@@ -29,21 +32,47 @@ create table day (
     primary key (id)
 );
 
+create table airline (
+    id  bigserial not null,
+    icao varchar(255),
+    name varchar(255),
+    primary key (id)
+);
+
+create table plane (
+    id  bigserial not null,
+    icao varchar(255),
+    primary key (id)
+);
+
+create table airport (
+    id  bigserial not null,
+    icao varchar(255),
+    name varchar(255),
+    region varchar(255),
+    primary key (id)
+);
+
 create table flight (
     id  bigserial not null,
-    airline varchar(255),
-    altitude int4,
+    altitude int4 not null,
     callsign varchar(255),
-    date timestamp,
-    departure_airport varchar(255),
-    departure_airport_name varchar(255),
-    icao varchar(255),
-    speed int4,
+    date_time timestamp,
+    speed int4 not null,
+    airline_id int8,
     day_id int8,
+    departure_id int8,
+    plane_id int8,
     primary key (id)
 );
 alter table flight
-    add constraint FKjhoo1xphjapbq7mr33orrvhfq foreign key (day_id) references day;
+    add constraint FK37wfh52g7g91rllg104gfq3yv foreign key (airline_id) references airline;
+alter table flight
+    add constraint FK64eg0jepjnnfeeaxf0j8ftq6b foreign key (day_id) references day;
+alter table flight
+    add constraint FK7p9fvp6d7uh9cgn47uet8a8nb foreign key (plane_id) references plane;
+alter table flight
+    add constraint FKaxqek9h4f7km4qg67twbx2go5 foreign key (departure_id) references airport;
 
 
 

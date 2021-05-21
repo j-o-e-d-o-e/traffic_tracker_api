@@ -9,7 +9,8 @@ import net.joedoe.traffictracker.repo.DayRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service

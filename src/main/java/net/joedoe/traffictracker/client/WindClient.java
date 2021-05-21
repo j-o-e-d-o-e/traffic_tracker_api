@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.client.WindClient.DataWrapper.WindData;
-import net.joedoe.traffictracker.model.Wind;
+import net.joedoe.traffictracker.dto.WindDto;
 import net.joedoe.traffictracker.service.DayService;
 import net.joedoe.traffictracker.util.PropertiesHandler;
 import okhttp3.OkHttpClient;
@@ -31,7 +31,7 @@ public class WindClient {
         this.service = service;
         this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            this.url = PropertiesHandler.getProperties("src/main/resources/wind.properties").getProperty("url.wind");
+            this.url = PropertiesHandler.getProperties("src/main/resources/wind.properties").getProperty("url-wind");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,12 +43,11 @@ public class WindClient {
             Response response = new OkHttpClient().newCall(new Request.Builder().url(url).build()).execute();
             String json = Objects.requireNonNull(response.body()).string();
             WindData windData = mapper.readValue(json, DataWrapper.class).data[0];
-            Wind wind = new Wind();
-            wind.setDate(LocalDateTime.now());
-            wind.setDeg(windData.wind_dir);
-            wind.setSpeed(Math.round(windData.wind_spd * 3600 / 1000f * 100) / 100f);
-            service.addWind(wind);
-            log.info(wind.toString());
+            WindDto windDto = new WindDto();
+            windDto.setDateTime(LocalDateTime.now());
+            windDto.setDeg(windData.wind_dir);
+            windDto.setSpeed(Math.round(windData.wind_spd * 3600 / 1000f * 100) / 100f);
+            service.addWind(windDto);
         } catch (IOException e) {
             e.printStackTrace();
         }

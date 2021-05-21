@@ -18,10 +18,8 @@ public class ForecastHour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     LocalTime time;
-    @Column
     @JsonProperty("wind_degree")
     int windDegree;
     @Column

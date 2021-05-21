@@ -16,25 +16,20 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    private String icao;
-    @Column
-    private LocalDateTime date;
-    @Column
+    private String callsign;
+    private LocalDateTime dateTime;
     private int altitude;
-    @Column
     private int speed;
-    @Column
-    private String departureAirport;
-    @Column
-    private String departureAirportName;
-    @Column
-    private String airline;
-    @Column
-    private String airlineName;
-    @SuppressWarnings("JpaDataSourceORMInspection")
     @ToString.Exclude
-    @ManyToOne
-    @JoinColumn(name = "day_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Day day;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Airport departure;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Plane plane;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Airline airline;
 }

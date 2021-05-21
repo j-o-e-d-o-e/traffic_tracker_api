@@ -21,7 +21,7 @@ public class YearMapper {
     static {
         try {
             YearMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties")
-                    .getProperty("startDate"));
+                    .getProperty("start-date"));
         } catch (IOException e) {
             e.printStackTrace();
         }

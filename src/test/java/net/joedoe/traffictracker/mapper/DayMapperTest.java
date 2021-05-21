@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.DayDto;
 import net.joedoe.traffictracker.model.Day;
 import org.junit.Test;
@@ -9,14 +9,14 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class DayMapperTest {
 
     @Test
     public void toDayDtoToday() {
-        Day day = DaysInit.createDay(LocalDate.now());
+        Day day = DaysInitTest.createDay(LocalDate.now());
 
         DayDto dayDto = DayMapper.toDto(day);
 
@@ -33,7 +33,7 @@ public class DayMapperTest {
 
     @Test
     public void toDayDtoYesterday() {
-        Day day = DaysInit.createDay(LocalDate.now().minusDays(1));
+        Day day = DaysInitTest.createDay(LocalDate.now().minusDays(1));
 
         DayDto dayDto = DayMapper.toDto(day);
 

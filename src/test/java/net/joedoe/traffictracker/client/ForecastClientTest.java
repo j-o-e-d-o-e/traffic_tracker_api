@@ -18,7 +18,7 @@ public class ForecastClientTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         client = new ForecastClient(repository, scoreRepository);
     }
 

@@ -1,19 +1,19 @@
 package net.joedoe.traffictracker.mapper;
 
-import net.joedoe.traffictracker.bootstrap.ForecastsInit;
+import net.joedoe.traffictracker.bootstrap.ForecastsInitTest;
 import net.joedoe.traffictracker.dto.ForecastDayDto;
 import net.joedoe.traffictracker.model.ForecastDay;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ForecastMapperTest {
 
     @Test
     public void toResources() {
-        List<ForecastDay> days = ForecastsInit.createDays();
+        List<ForecastDay> days = ForecastsInitTest.createDays();
         ForecastDay day = days.get(0);
 
         List<ForecastDayDto> dayDtos = ForecastMapper.toResources(days);

@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.controller;
 
-import net.joedoe.traffictracker.bootstrap.DaysInit;
-import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
+import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.hateoas.WeekAssembler;
 import net.joedoe.traffictracker.mapper.WeekMapper;
 import net.joedoe.traffictracker.model.Day;
@@ -31,14 +31,14 @@ public class WeekControllerTest {
     private WeekService service;
     private MockMvc mockMvc;
     private final LocalDate date = LocalDate.now().with(DayOfWeek.MONDAY);
-    private final List<Day> days = DaysInit.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
+    private final List<Day> days = DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1);
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         WeekController controller = new WeekController(service, new WeekAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
+                .setControllerAdvice(new NotFoundExceptionHandler()).build();
     }
 
     @Test

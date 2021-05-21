@@ -1,6 +1,7 @@
 package net.joedoe.traffictracker.client;
 
 import net.joedoe.traffictracker.service.DayService;
+import net.joedoe.traffictracker.service.PlaneService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,13 +11,13 @@ import org.mockito.MockitoAnnotations;
 @Ignore("To avoid remote call to opensky-network")
 public class FlightClientTest {
     @Mock
-    private DayService service;
+    private DayService dayService;
     private FlightClient client;
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        client = new FlightClient(service);
+        MockitoAnnotations.openMocks(this);
+        client = new FlightClient(dayService);
     }
 
     @Test

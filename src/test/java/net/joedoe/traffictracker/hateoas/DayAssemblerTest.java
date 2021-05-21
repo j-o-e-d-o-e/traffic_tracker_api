@@ -1,7 +1,7 @@
 package net.joedoe.traffictracker.hateoas;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.DayDto;
 import net.joedoe.traffictracker.mapper.DayMapper;
 import org.junit.Test;
@@ -10,7 +10,8 @@ import org.springframework.hateoas.EntityModel;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Slf4j
 public class DayAssemblerTest {
@@ -20,7 +21,7 @@ public class DayAssemblerTest {
     @Test
     public void toModelToday(){
         LocalDate date = LocalDate.now();
-        DayDto dayDto = DayMapper.toDto(DaysInit.createDay(date));
+        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date));
         EntityModel<DayDto> model = assembler.toModel(dayDto);
 
         assertEquals("/api/days/" + date.minusDays(1), model.getRequiredLink("prev_day").getHref());
@@ -33,7 +34,7 @@ public class DayAssemblerTest {
     @Test
     public void toModelYesterday(){
         LocalDate date = LocalDate.now().minusDays(1);
-        DayDto dayDto = DayMapper.toDto(DaysInit.createDay(date));
+        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date));
 
         EntityModel<DayDto> model = assembler.toModel(dayDto);
 

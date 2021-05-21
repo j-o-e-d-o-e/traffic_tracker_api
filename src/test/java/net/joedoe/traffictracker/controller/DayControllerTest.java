@@ -1,8 +1,8 @@
 package net.joedoe.traffictracker.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.DaysInit;
-import net.joedoe.traffictracker.exception.RestResponseEntityExceptionHandler;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
+import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.hateoas.DayAssembler;
 import net.joedoe.traffictracker.mapper.DayMapper;
 import net.joedoe.traffictracker.model.Day;
@@ -35,15 +35,15 @@ public class DayControllerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         DayController controller = new DayController(service, new DayAssembler());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
+                .setControllerAdvice(new NotFoundExceptionHandler()).build();
     }
 
     @Test
     public void getCurrentDay() throws Exception {
-        Day day = DaysInit.createDay(LocalDate.now());
+        Day day = DaysInitTest.createDay(LocalDate.now());
 
         when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
         mockMvc.perform(get("/api/days/current")
@@ -55,7 +55,7 @@ public class DayControllerTest {
 
     @Test
     public void getDayByDate() throws Exception {
-        Day day = DaysInit.createDay(LocalDate.now().minusDays(1));
+        Day day = DaysInitTest.createDay(LocalDate.now().minusDays(1));
 
         when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
 

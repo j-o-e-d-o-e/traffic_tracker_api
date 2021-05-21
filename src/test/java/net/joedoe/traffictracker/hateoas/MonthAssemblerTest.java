@@ -1,23 +1,22 @@
 package net.joedoe.traffictracker.hateoas;
 
 import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.bootstrap.DaysInit;
+import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.MonthDto;
 import net.joedoe.traffictracker.mapper.MonthMapper;
-import net.joedoe.traffictracker.model.Day;
 import org.junit.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Slf4j
 public class MonthAssemblerTest {
     private final MonthAssembler assembler = new MonthAssembler();
     private final LocalDate startDate = LocalDate.now().withDayOfMonth(1);
-    private final MonthDto month = MonthMapper.toDto(startDate, DaysInit.createDays(LocalDate.now().getDayOfMonth() - 1));
+    private final MonthDto month = MonthMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1));
 
     @Test
     public void toModel() {
