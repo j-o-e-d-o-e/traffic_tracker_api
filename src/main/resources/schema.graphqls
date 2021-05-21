@@ -1,0 +1,115 @@
+"""ISO date, e.g. 2021-02-12"""
+scalar Date
+scalar Time
+
+"""Tracks flights to __DUS__ airport arriving from the east - only for last 60 days."""
+type Query {
+    """Airline by ICAO"""
+    airline(icao: String="EWG"): Airline!
+    """All airlines for last 60 days"""
+    airlines(req: PageRequest): PageAirline!
+    """A departure airport by ICAO"""
+    departure(icao: String="EDDB"): Airport!
+    """All departure airports for last 60 days"""
+    departures(req: PageRequest region: Region): PageAirport!
+   """A plane by ICAO"""
+    plane(icao: String!): Plane
+    """All planes for last 60 days"""
+    planes(req: PageRequest): PagePlane!
+    """A day, defaults to current date"""
+    day(date: Date): Day
+    """All days"""
+    days(req: PageRequest): PageDay!
+}
+
+"""An airline, e.g. Eurowings (ICAO: EWG)"""
+type Airline {
+    id: ID!
+    icao: String!
+    name: String
+    flights(req: PageRequest): PageFlight!
+}
+
+"""A departure airport, e.g. Berlin (ICAO: EDDB)"""
+type Airport {
+    id: ID!
+    icao: String!
+    name: String
+    region: Region!
+    flights(req: PageRequest): PageFlight!
+}
+
+"""A plane flying to DUS airport"""
+type Plane {
+    id: ID!
+    icao: String!
+    flights(req: PageRequest): PageFlight!
+}
+
+type Day {
+    id: ID!
+    date: Date!
+    total: Int!
+    flights(req: PageRequest): PageFlight!
+}
+
+"""A flight to DUS airport"""
+type Flight {
+    id: ID!
+    callsign: String!
+    date: Date
+    time: Time
+    altitude: Int
+    speed: Int
+    departure: Airport
+    airline: Airline
+    plane: Plane
+}
+
+enum Region {
+    INTERCONTINENTAL
+    INTERNATIONAL
+    NATIONAL
+}
+
+input PageRequest {
+    """Must not be negative"""
+    page: Int = 0
+    """Must not be negative and <= 50"""
+    size: Int = 10
+}
+
+type PageFlight {
+    content: [Flight]!
+    totalElements: Int!
+    totalPages: Int!
+    pageNumber: Int!
+}
+
+type PageAirport {
+    content: [Airport]!
+    totalElements: Int!
+    totalPages: Int!
+    pageNumber: Int!
+}
+
+type PageAirline {
+    content: [Airline]!
+    totalElements: Int!
+    totalPages: Int!
+    pageNumber: Int!
+}
+
+type PagePlane {
+    content: [Plane]!
+    totalElements: Int!
+    totalPages: Int!
+    pageNumber: Int!
+}
+
+type PageDay {
+    content: [Day]!
+    totalElements: Int!
+    totalPages: Int!
+    pageNumber: Int!
+}

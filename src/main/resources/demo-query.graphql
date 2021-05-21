@@ -1,0 +1,16 @@
+query departuresByRegion($req: PageRequest, $region: Region) {
+  departures(req: $req, region: $region) {
+    icao
+    name
+    flights {
+      totalElements
+      content {
+        date
+        airline {
+          icao
+          name
+        }
+      }
+    }
+  }
+}
