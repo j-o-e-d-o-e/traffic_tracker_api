@@ -16,7 +16,7 @@ type Query {
     plane(icao: String!): Plane
     """All planes for last 60 days"""
     planes(req: PageRequest): PagePlane!
-    """A day, defaults to current date"""
+    """A day by ISO-date"""
     day(date: Date): Day
     """All days"""
     days(req: PageRequest): PageDay!
@@ -46,6 +46,7 @@ type Plane {
     flights(req: PageRequest): PageFlight!
 }
 
+"""A day, defaults to current date"""
 type Day {
     id: ID!
     date: Date!
@@ -75,7 +76,7 @@ enum Region {
 input PageRequest {
     """Must not be negative"""
     page: Int = 0
-    """Must not be negative and <= 50"""
+    """Must not be negative and <= 20"""
     size: Int = 10
 }
 
