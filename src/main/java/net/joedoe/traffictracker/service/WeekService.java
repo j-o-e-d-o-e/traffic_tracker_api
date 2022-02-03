@@ -22,10 +22,15 @@ public class WeekService {
     }
 
     public WeekDto getWeek(LocalDate date) {
-        Optional<List<Day>> week = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1));
-        if (!week.isPresent() || week.get().isEmpty()) {
+        List<Day> week = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1)).orElse(null);
+        if (week == null || week.isEmpty()) {
             throw new NotFoundException("Could not find week " + date + " to " + date.plusWeeks(1));
         }
-        return WeekMapper.toDto(date, week.get());
+        return WeekMapper.toDto(date, week, hasNeighbour(date.minusWeeks(1)), hasNeighbour(date.plusWeeks(1)));
+    }
+
+    private boolean hasNeighbour(LocalDate date) {
+        Optional<List<Day>> week = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1));
+        return week.isPresent() && !week.get().isEmpty();
     }
 }

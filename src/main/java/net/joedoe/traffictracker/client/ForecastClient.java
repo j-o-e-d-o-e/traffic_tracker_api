@@ -14,7 +14,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -48,7 +47,7 @@ public class ForecastClient {
         }
     }
 
-    @Scheduled(cron = "0 0 0,3,6,9,12,15,18,21 * * *", zone = "${timezone}")
+//    @Scheduled(cron = "0 0 0,3,6,9,12,15,18,21 * * *", zone = "${timezone}")
     public void predict() {
         try {
             long start = System.currentTimeMillis();
@@ -66,7 +65,7 @@ public class ForecastClient {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "${timezone}")
+//    @Scheduled(cron = "0 0 0 * * *", zone = "${timezone}")
     public void score() {
         try {
             long start = System.currentTimeMillis();

@@ -20,7 +20,7 @@ public class YearMapperTest {
 
     @Test
     public void toDto() {
-        YearDto yearDto = YearMapper.toDto(startDate, days);
+        YearDto yearDto = YearMapper.toDto(startDate, days, true, true);
 
         assertEquals(startDate, yearDto.getStart_date());
         int total = days.stream().mapToInt(Day::getTotal).sum();

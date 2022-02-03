@@ -10,7 +10,10 @@ import net.joedoe.traffictracker.model.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -92,16 +95,16 @@ public class StatsMapper {
 //             plane_with_most_flights_within_one_day
             Map.Entry<String, Integer> plane = planesDaily.entrySet().stream().max(Map.Entry.comparingByValue()).orElse(null);
             if (plane != null && plane.getValue() >= planeWithMostFlightsWithinOneDay.getStats()) {
-                planeWithMostFlightsWithinOneDay.setDay(DayMapper.toDto(day));
+                planeWithMostFlightsWithinOneDay.setDay(DayMapper.toDto(day, true, true));
                 planeWithMostFlightsWithinOneDay.setStats(plane.getValue());
                 planeWithMostFlightsWithinOneDay.setIcao(plane.getKey());
             }
         }
         StatsDto statsDto = new StatsDto();
         statsDto.setTotal(total);
-        StatsDay statsDay = new StatsDay(DayMapper.toDto(dayWithMostFlights), dayWithMostFlights.getTotal());
+        StatsDay statsDay = new StatsDay(DayMapper.toDto(dayWithMostFlights, true, true), dayWithMostFlights.getTotal());
         statsDto.setDay_with_most_flights(statsDay);
-        statsDay = new StatsDay(DayMapper.toDto(dayWithMostFlightsWithinOneHour), mostFlightsWithinOneHour);
+        statsDay = new StatsDay(DayMapper.toDto(dayWithMostFlightsWithinOneHour, true, true), mostFlightsWithinOneHour);
         statsDto.setDay_with_most_flights_within_one_hour(statsDay);
         float percentage = (daysWithLessThanThirtyFlights / (float) (days.size() - 1)) * 100;
         statsDto.setDays_with_less_than_thirty_flights(Math.round(percentage * 100) / 100f);

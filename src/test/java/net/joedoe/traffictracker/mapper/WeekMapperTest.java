@@ -21,7 +21,7 @@ public class WeekMapperTest {
 
     @Test
     public void daysToWeekDto() {
-        WeekDto weekDto = WeekMapper.toDto(startDate, days);
+        WeekDto weekDto = WeekMapper.toDto(startDate, days, true, true);
 
         assertEquals(startDate, weekDto.getStart_date());
         int total = days.stream().mapToInt(Day::getTotal).sum();

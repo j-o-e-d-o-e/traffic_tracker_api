@@ -23,7 +23,7 @@ public class DayResolver implements GraphQLQueryResolver {
     }
 
     public Day day(LocalDate date) {
-        if (date == null) date = LocalDate.now();
+        if (date == null) date = LocalDate.now().minusDays(1);
         return service.findDayByDate(date);
     }
 

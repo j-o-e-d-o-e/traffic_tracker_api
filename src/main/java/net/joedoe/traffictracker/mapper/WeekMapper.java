@@ -4,41 +4,28 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.util.PropertiesHandler;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
 public class WeekMapper {
-    private static LocalDate date;
 
-    static {
-        try {
-            WeekMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("start-date"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static WeekDto toDto(LocalDate date, List<Day> days) {
+    public static WeekDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         WeekDto weekDto = new WeekDto();
         weekDto.setStart_date(date);
-        LocalDate endDate = date.plusDays(6);
         weekDto.setEnd_date(date.plusDays(6));
+        days.sort(Comparator.comparing(Day::getDate));
+        weekDto.setFirst_day(days.get(0).getDate());
         weekDto.setNow(LocalDateTime.now());
         weekDto.setYear(date.getYear());
         weekDto.setMonth(date.getMonthValue());
-        weekDto.setPrev(date.minusDays(6).isAfter(WeekMapper.date));
-        weekDto.setNext(endDate.isBefore(LocalDate.now()));
+        weekDto.setPrev(prev);
+        weekDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0;
         int[] weekdays = new int[7];

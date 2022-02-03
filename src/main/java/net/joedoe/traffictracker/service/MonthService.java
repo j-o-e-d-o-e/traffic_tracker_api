@@ -22,10 +22,15 @@ public class MonthService {
     }
 
     public MonthDto getMonth(LocalDate date) {
-        Optional<List<Day>> month = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1));
-        if (!month.isPresent() || month.get().isEmpty()) {
+        List<Day> month = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1)).orElse(null);
+        if (month == null || month.isEmpty()) {
             throw new NotFoundException("Could not find month " + date.getMonthValue() + "/" + date.getYear());
         }
-        return MonthMapper.toDto(date, month.get());
+        return MonthMapper.toDto(date, month, hasNeighbour(date.minusMonths(1)), hasNeighbour(date.plusMonths(1)));
+    }
+
+    private boolean hasNeighbour(LocalDate date) {
+        Optional<List<Day>> month = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusMonths(1));
+        return month.isPresent() && !month.get().isEmpty();
     }
 }

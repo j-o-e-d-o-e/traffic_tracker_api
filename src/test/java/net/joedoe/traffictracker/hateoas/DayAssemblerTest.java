@@ -21,7 +21,7 @@ public class DayAssemblerTest {
     @Test
     public void toModelToday(){
         LocalDate date = LocalDate.now();
-        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date));
+        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date), true, false);
         EntityModel<DayDto> model = assembler.toModel(dayDto);
 
         assertEquals("/api/days/" + date.minusDays(1), model.getRequiredLink("prev_day").getHref());
@@ -34,7 +34,7 @@ public class DayAssemblerTest {
     @Test
     public void toModelYesterday(){
         LocalDate date = LocalDate.now().minusDays(1);
-        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date));
+        DayDto dayDto = DayMapper.toDto(DaysInitTest.createDay(date), true, true);
 
         EntityModel<DayDto> model = assembler.toModel(dayDto);
 

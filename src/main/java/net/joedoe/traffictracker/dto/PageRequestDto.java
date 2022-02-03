@@ -12,6 +12,6 @@ public class PageRequestDto {
     @Min(value = 0, message = "requested page number must not be negative")
     private int page;
     @Min(value = 0, message = "requested page size must not be negative")
-    @Max(value = 50, message = "requested page size must be <= 50")
+    @Max(value = 20, message = "requested page size must be <= 20")
     private int size;
 }

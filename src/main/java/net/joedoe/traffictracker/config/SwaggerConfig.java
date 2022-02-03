@@ -55,8 +55,8 @@ public class SwaggerConfig {
 
         return new ApiInfo(
                 "Traffic tracker",
-                "Tracks flights to <strong>DUS</strong> airport arriving from the east " +
-                        "- since <strong>9.9.2019</strong>." +
+                "Tracks flights to <strong>DUS</strong> airport landing from the east " +
+                        "- <strong>since 09.09.2019</strong>." +
                         "\n<a href='https://j-o-e-d-o-e.github.io/traffic-tracker'>Angular client</a>" +
                         "\n<a href='https://github.com/j-o-e-d-o-e/traffic_tracker_api'>Github Repo</a>",
                 "2.0",

@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 @Profile("h2")
 @Order(1)
@@ -33,7 +33,22 @@ public class InitLocalH2 implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        dayService.addDay();
+        // old data
+        dayService.addDayByDate(LocalDate.now().minusDays(16));
+        List<String> p_icao = Arrays.asList("4bccba", "3c6743", "40083b");
+        final List<String> a_icao = Arrays.asList("GWI", "EWG", "DLH");
+        for (int i = 0; i < 3; i++) {
+            String callsign = a_icao.get(i) + "123";
+            Flight newFlight = new Flight();
+            newFlight.setCallsign(callsign);
+            newFlight.setDateTime(LocalDateTime.now().minusDays(16));
+            if (i == 0) newFlight.setDateTime(LocalDateTime.of(LocalDate.now().minusDays(16), LocalTime.NOON));
+            newFlight.setAltitude(rand.nextInt(100) + 900);
+            newFlight.setSpeed(rand.nextInt(100) + 300);
+            dayService.addFlight(p_icao.get(i), newFlight);
+        }
+        // new data
+        dayService.addDayByDate(LocalDate.now());
         // WindClient
         LocalDateTime time = LocalDateTime.now();
         for (int i = 0; i < 24 - time.getHour(); i++) {
@@ -44,13 +59,13 @@ public class InitLocalH2 implements CommandLineRunner {
             dayService.addWind(windDto);
         }
         // FlightClient
-        List<String> p_icao = Arrays.asList("4bccba", "3c6743", "40083b");
-        final List<String> a_icao = Arrays.asList("GWI", "EWG", "DLH");
         for (int i = 0; i < 3; i++) {
-            String callsign = a_icao.get(i) + UUID.randomUUID().toString().substring(0, 4);
+//            String callsign = a_icao.get(i) + UUID.randomUUID().toString().substring(0, 4);
+            String callsign = a_icao.get(i) + "123";
             Flight newFlight = new Flight();
             newFlight.setCallsign(callsign);
             newFlight.setDateTime(LocalDateTime.now());
+            if (i == 0) newFlight.setDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.NOON));
             newFlight.setAltitude(rand.nextInt(100) + 900);
             newFlight.setSpeed(rand.nextInt(100) + 300);
             dayService.addFlight(p_icao.get(i), newFlight);

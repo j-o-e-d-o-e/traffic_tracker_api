@@ -31,7 +31,8 @@ public class FlightMapper {
             departureIcao = departure.getIcao();
             departureName = departure.getName();
         }
+        boolean photoExists = flight.getPhoto() != null;
         return new FlightDto(flight.getId(), flight.getCallsign(), icao_24, dateTime, LocalDate.from(dateTime),
-                flight.getAltitude(), flight.getSpeed(), departureIcao, departureName, airlineIcao, airlineName);
+                flight.getAltitude(), flight.getSpeed(), departureIcao, departureName, airlineIcao, airlineName, photoExists);
     }
 }

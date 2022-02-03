@@ -18,7 +18,7 @@ public class WeekAssemblerTest {
 
     @Test
     public void toModel(){
-        WeekDto week = WeekMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1));
+        WeekDto week = WeekMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1), true, true);
 
         EntityModel<WeekDto> weekDto = assembler.toModel(week);
 

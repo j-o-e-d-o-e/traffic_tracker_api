@@ -16,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +57,11 @@ public class FlightService {
         return repository.getFlightsByDateTimeBetweenOrderByDateTimeDesc(time, time.plusDays(1)).orElse(null);
     }
 
+    @Transactional
+    public void delete(){
+        repository.deleteByDateTimeIsBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(flightsSavedInDays + 1));
+    }
+
     // Rest
 
     public Page<FlightDto> getByDate(LocalDate date, Pageable pageable) {
@@ -75,6 +82,32 @@ public class FlightService {
             throw new NotFoundException("Could not find flights by plane with icao " + icao);
         }
         return page.get().map(FlightMapper::toDto);
+    }
+
+    public void savePhoto(Long id, MultipartFile file) throws IOException {
+        Flight flight = repository.findById(id).orElse(null);
+        if (flight == null) {
+            log.info("Could not find flight with id " + id);
+            throw new NotFoundException("Could not find flight with id " + id);
+        }
+        Byte[] bytes = new Byte[file.getBytes().length]; // hibernate prefers obj to primitives
+        int i = 0;
+        for (byte b : file.getBytes()) bytes[i++] = b;
+        flight.setPhoto(bytes);
+        repository.save(flight);
+        log.info("Photo added: " + flight);
+    }
+
+    public byte[] loadPhoto(Long id) {
+        Flight flight = repository.findById(id).orElse(null);
+        if (flight == null)
+            throw new NotFoundException("Could not find flight with id " + id);
+        if (flight.getPhoto() == null)
+            throw new NotFoundException("Could not find photo of flight with id " + id);
+        byte[] bytes = new byte[flight.getPhoto().length];
+        int i = 0;
+        for (Byte b : flight.getPhoto()) bytes[i++] = b; // auto unboxing
+        return bytes;
     }
 
     // GraphQL

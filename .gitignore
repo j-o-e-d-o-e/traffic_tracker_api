@@ -3,3 +3,4 @@
 
 .idea
 *.iml
+/src/main/java/net/joedoe/traffictracker/bootstrap/InitLocalH2Device.java

@@ -2,19 +2,19 @@
 scalar Date
 scalar Time
 
-"""Tracks flights to __DUS__ airport arriving from the east - only for last 60 days."""
+"""Tracks flights to __DUS__ airport arriving from the east - only for last 15 days."""
 type Query {
     """Airline by ICAO"""
     airline(icao: String="EWG"): Airline!
-    """All airlines for last 60 days"""
+    """All airlines for last 15 days"""
     airlines(req: PageRequest): PageAirline!
     """A departure airport by ICAO"""
     departure(icao: String="EDDB"): Airport!
-    """All departure airports for last 60 days"""
+    """All departure airports for last 15 days"""
     departures(req: PageRequest region: Region): PageAirport!
    """A plane by ICAO"""
     plane(icao: String!): Plane
-    """All planes for last 60 days"""
+    """All planes for last 15 days"""
     planes(req: PageRequest): PagePlane!
     """A day by ISO-date"""
     day(date: Date): Day
@@ -65,6 +65,7 @@ type Flight {
     departure: Airport
     airline: Airline
     plane: Plane
+    photo: String
 }
 
 enum Region {

@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -27,7 +30,7 @@ public class YearMapper {
         }
     }
 
-    public static YearDto toDto(LocalDate date, List<Day> days) {
+    public static YearDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         YearDto yearDto = new YearDto();
         yearDto.setStart_date(date);
         LocalDate endDate = date.plusYears(1).minusDays(1);
@@ -38,8 +41,8 @@ public class YearMapper {
             yearDto.setFirst_month(YearMapper.date.getMonthValue());
         else
             yearDto.setFirst_month(1);
-        yearDto.setPrev(date.minusYears(1).plusDays(1).isAfter(YearMapper.date.withMonth(1).withDayOfMonth(1)));
-        yearDto.setNext(endDate.isBefore(LocalDate.now()));
+        yearDto.setPrev(prev);
+        yearDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0, absDaysWithLessThanThirtyFlights = 0;
         int[] months = new int[12];

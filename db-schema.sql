@@ -58,6 +58,7 @@ create table flight (
     altitude int4 not null,
     callsign varchar(255),
     date_time timestamp,
+    photo bytea,
     speed int4 not null,
     airline_id int8,
     day_id int8,
@@ -120,3 +121,10 @@ create table day_departures_top
 );
 alter table day_departures_top
     add constraint FK5q23q20fny9svqw82d0g7iosm foreign key (day_id) references day;
+
+create table device (
+    id  bigserial not null,
+    name varchar(255),
+    pw varchar(255),
+    primary key (id)
+);

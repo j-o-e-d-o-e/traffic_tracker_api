@@ -32,4 +32,7 @@ public class Flight {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     private Airline airline;
+    @ToString.Exclude
+//    @Lob
+    private Byte[] photo;
 }

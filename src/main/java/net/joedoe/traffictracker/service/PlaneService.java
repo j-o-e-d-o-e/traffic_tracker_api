@@ -29,7 +29,8 @@ public class PlaneService {
     }
 
     public void delete() {
-        repository.findAll().stream().filter(plane -> plane.getFlights().isEmpty()).forEach(repository::delete);
+        repository.findAllJoinFetchFlights().stream()
+                .filter(plane -> plane.getFlights().isEmpty()).forEach(repository::delete);
     }
 
     // GraphQL

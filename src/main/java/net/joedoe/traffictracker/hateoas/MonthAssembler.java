@@ -9,9 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.time.LocalDate;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Slf4j
 @Component
@@ -30,7 +32,7 @@ public class MonthAssembler implements RepresentationModelAssembler<MonthDto, En
             LocalDate date = LocalDate.of(month.getYear(), month.getMonth(), 1).plusMonths(1);
             model.add(linkTo(methodOn(MonthController.class).getMonthByDate(date.getYear(), date.getMonthValue())).withRel("next_month"));
         }
-        model.add(linkTo(methodOn(WeekController.class).getWeekByDate(LocalDate.of(month.getYear(), month.getMonth(), 1))).withRel("weeks"));
+        model.add(linkTo(methodOn(WeekController.class).getWeekByDate(month.getFirst_week())).withRel("weeks"));
         model.add(linkTo(methodOn(YearController.class).getYearByDate(month.getYear())).withRel("year"));
         return model;
     }

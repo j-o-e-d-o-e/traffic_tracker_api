@@ -16,6 +16,7 @@ import java.util.List;
 public class WeekDto {
     private LocalDate start_date;
     private LocalDate end_date;
+    private LocalDate first_day;
     private LocalDateTime now;
     private int year;
     private int month;

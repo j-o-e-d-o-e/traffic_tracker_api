@@ -8,7 +8,6 @@ import org.opensky.api.OpenSkyApi;
 import org.opensky.api.OpenSkyApi.BoundingBox;
 import org.opensky.model.OpenSkyStates;
 import org.opensky.model.StateVector;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -57,7 +56,7 @@ public class FlightClient {
         }
     }
 
-    @Scheduled(fixedRate = 20000)
+//    @Scheduled(fixedRate = 20000)
     void fetchFlights() {
         flights = flights.stream().filter(this::checkTimeout).collect(Collectors.toList());
         log.info("Current data size: " + flights.size());

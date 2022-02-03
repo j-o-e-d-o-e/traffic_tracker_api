@@ -6,6 +6,7 @@ import net.joedoe.traffictracker.dto.FlightDto;
 import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.hateoas.FlightAssembler;
 import net.joedoe.traffictracker.mapper.FlightMapper;
+import net.joedoe.traffictracker.repo.DeviceRepository;
 import net.joedoe.traffictracker.service.FlightService;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,13 +37,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FlightControllerTest {
     @Mock
     private FlightService service;
+    @Mock
+    private DeviceRepository deviceRepository;
     private MockMvc mockMvc;
     private List<FlightDto> flights;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        FlightController controller = new FlightController(service, new FlightAssembler());
+        FlightController controller = new FlightController(service, new FlightAssembler(), deviceRepository);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setViewResolvers((viewName, locale) -> new MappingJackson2JsonView())

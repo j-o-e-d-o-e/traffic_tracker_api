@@ -24,6 +24,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     @Query(value = "SELECT f FROM Flight f WHERE f.plane.icao = :icao order by f.dateTime desc")
     Optional<Page<Flight>> findByPlaneIcao(@Param("icao") String icao, Pageable pageable);
 
+    void deleteByDateTimeIsBefore(LocalDateTime localDateTime);
+
     // GraphQL
 
     @Query(value = "SELECT f FROM Flight f WHERE f.airline.icao = :icao order by f.dateTime desc")

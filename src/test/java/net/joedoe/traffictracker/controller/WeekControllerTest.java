@@ -45,7 +45,7 @@ public class WeekControllerTest {
     public void getCurrentWeek() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days));
+        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days, true, true));
 
         mockMvc.perform(get("/api/weeks/current")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -58,7 +58,7 @@ public class WeekControllerTest {
     public void getWeekByDate() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days));
+        when(service.getWeek(date)).thenReturn(WeekMapper.toDto(date, days, true, true));
 
         String dateFormat = DateTimeFormatter.ISO_DATE.format(date);
         mockMvc.perform(get("/api/weeks/" + dateFormat)

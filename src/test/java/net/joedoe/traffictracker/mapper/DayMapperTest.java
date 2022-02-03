@@ -18,7 +18,7 @@ public class DayMapperTest {
     public void toDayDtoToday() {
         Day day = DaysInitTest.createDay(LocalDate.now());
 
-        DayDto dayDto = DayMapper.toDto(day);
+        DayDto dayDto = DayMapper.toDto(day, true, false);
 
         assertEquals(day.getDate(), dayDto.getDate());
         assertEquals(day.getTotal(), dayDto.getTotal());
@@ -35,7 +35,7 @@ public class DayMapperTest {
     public void toDayDtoYesterday() {
         Day day = DaysInitTest.createDay(LocalDate.now().minusDays(1));
 
-        DayDto dayDto = DayMapper.toDto(day);
+        DayDto dayDto = DayMapper.toDto(day, true, true);
 
         assertEquals(day.getDate(), dayDto.getDate());
         assertEquals(day.getTotal(), dayDto.getTotal());

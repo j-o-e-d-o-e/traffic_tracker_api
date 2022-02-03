@@ -17,7 +17,7 @@ public class YearAssemblerTest {
 
     @Test
     public void toModel() {
-        YearDto year = YearMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfYear() - 1));
+        YearDto year = YearMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfYear() - 1), true, true);
 
         EntityModel<YearDto> yearDto = assembler.toModel(year);
 

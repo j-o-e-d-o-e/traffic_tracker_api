@@ -34,7 +34,7 @@ public class FlightsInitTest {
         flight.setAltitude((int) (Math.random() * 1500) + 600);
         flight.setSpeed((int) (Math.random() * 600) + 300);
         flight.setCallsign("Callsign");
-        Plane plane = new Plane("3c56f0");
+        Plane plane = new Plane("3C56F0");
         flight.setPlane(plane);
         Airline airline = new Airline("AIR", "Airline");
         flight.setAirline(airline);

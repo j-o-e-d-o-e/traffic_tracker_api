@@ -21,23 +21,25 @@ import java.util.stream.Collectors;
 @Component
 public class DayMapper {
     private static LocalDate date;
+    private static int flightsSavedInDays;
 
     static {
         try {
             DayMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("start-date"));
+            DayMapper.flightsSavedInDays = Integer.parseInt(PropertiesHandler.getProperties("src/main/resources/flights-db.properties").getProperty("flights.saved.in.days"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static DayDto toDto(Day day) {
+    public static DayDto toDto(Day day, boolean prev, boolean next) {
         DayDto dayDto = new DayDto();
         dayDto.setId(day.getId());
         dayDto.setDate(day.getDate());
         dayDto.setNow(LocalDateTime.now());
         dayDto.setWeekday(dayDto.getDate().getDayOfWeek().name());
-        dayDto.setPrev(dayDto.getDate().isAfter(DayMapper.date));
-        dayDto.setNext(dayDto.getDate().isBefore(LocalDate.now()));
+        dayDto.setPrev(prev);
+        dayDto.setNext(next);
         dayDto.setTotal(day.getTotal());
         dayDto.setAvg_flights(getAvgFlights(day));
         dayDto.setAvg_altitude(day.getAvgAltitude());
@@ -48,7 +50,7 @@ public class DayMapper {
         dayDto.setHours_wind(getHoursWind(day));
         dayDto.setDepartures(getDepartures(day));
         dayDto.setAirports(getAirportDtos(day));
-        dayDto.setFlights(day.getTotal() != 0);
+        dayDto.setFlights(day.getTotal() > 0 && day.getDate().isAfter(LocalDate.now().minusDays(flightsSavedInDays)));
         return dayDto;
     }
 

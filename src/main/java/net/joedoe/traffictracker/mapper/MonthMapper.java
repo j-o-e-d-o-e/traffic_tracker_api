@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -30,12 +27,14 @@ public class MonthMapper {
         }
     }
 
-    public static MonthDto toDto(LocalDate date, List<Day> days) {
+    public static MonthDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         MonthDto monthDto = new MonthDto();
         monthDto.setStart_date(date);
         int daysOfMonth = date.getMonth().length(date.isLeapYear());
         LocalDate endDate = date.plusDays(daysOfMonth - 1);
         monthDto.setEnd_date(endDate);
+        days.sort(Comparator.comparing(Day::getDate));
+        monthDto.setFirst_week(days.get(0).getDate());
         monthDto.setNow(LocalDateTime.now());
         monthDto.setYear(date.getYear());
         monthDto.setMonth(date.getMonthValue());
@@ -43,8 +42,8 @@ public class MonthMapper {
             monthDto.setFirst_day_of_month(MonthMapper.date);
         else
             monthDto.setFirst_day_of_month(date);
-        monthDto.setPrev(date.minusMonths(1).plusDays(1).isAfter(MonthMapper.date.withDayOfMonth(1)));
-        monthDto.setNext(endDate.isBefore(LocalDate.now()));
+        monthDto.setPrev(prev);
+        monthDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0, absDaysWithLessThanThirtyFlights = 0;
         int[] monthDays = new int[daysOfMonth];

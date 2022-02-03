@@ -22,7 +22,7 @@ public class MonthMapperTest {
 
     @Test
     public void toDto() {
-        MonthDto monthDto = MonthMapper.toDto(startDate, days);
+        MonthDto monthDto = MonthMapper.toDto(startDate, days, true, true);
 
         assertEquals(startDate, monthDto.getStart_date());
         int total = days.stream().mapToInt(Day::getTotal).sum();

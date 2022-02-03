@@ -6,6 +6,7 @@ import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
 import net.joedoe.traffictracker.hateoas.DayAssembler;
 import net.joedoe.traffictracker.mapper.DayMapper;
 import net.joedoe.traffictracker.model.Day;
+import net.joedoe.traffictracker.repo.DeviceRepository;
 import net.joedoe.traffictracker.service.DayService;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,13 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DayControllerTest {
     @Mock
     private DayService service;
+    @Mock
+    private DeviceRepository userRepository;
     private MockMvc mockMvc;
     private final LocalDate date = LocalDate.now();
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        DayController controller = new DayController(service, new DayAssembler());
+        DayController controller = new DayController(service, new DayAssembler(), userRepository);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new NotFoundExceptionHandler()).build();
     }
@@ -45,7 +48,7 @@ public class DayControllerTest {
     public void getCurrentDay() throws Exception {
         Day day = DaysInitTest.createDay(LocalDate.now());
 
-        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
+        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day, true, false));
         mockMvc.perform(get("/api/days/current")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -57,7 +60,7 @@ public class DayControllerTest {
     public void getDayByDate() throws Exception {
         Day day = DaysInitTest.createDay(LocalDate.now().minusDays(1));
 
-        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day));
+        when(service.getDayByDate(date)).thenReturn(DayMapper.toDto(day, true, true));
 
         String dateFormat = DateTimeFormatter.ISO_DATE.format(date);
         mockMvc.perform(get("/api/days/" + dateFormat)

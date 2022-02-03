@@ -39,12 +39,6 @@ public class DayServiceTest {
     }
 
     @Test
-    public void addNewDay() {
-        service.addDay();
-        verify(repository, times(1)).save(any());
-    }
-
-    @Test
     public void addFlight() {
         Flight flight = FlightsInitTest.createFlight(new Day(date));
         flight.setDateTime(dateTime);

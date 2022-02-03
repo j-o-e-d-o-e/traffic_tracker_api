@@ -43,7 +43,7 @@ public class YearControllerTest {
     public void getCurrentYear() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getYear(date)).thenReturn(YearMapper.toDto(date, days));
+        when(service.getYear(date)).thenReturn(YearMapper.toDto(date, days, true, true));
 
         mockMvc.perform(get("/api/years/current")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -55,7 +55,7 @@ public class YearControllerTest {
     public void getYearByDate() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getYear(date)).thenReturn(YearMapper.toDto(date, days));
+        when(service.getYear(date)).thenReturn(YearMapper.toDto(date, days, true, true));
 
         mockMvc.perform(get("/api/years/" + LocalDate.now().getYear())
                 .contentType(MediaType.APPLICATION_JSON))

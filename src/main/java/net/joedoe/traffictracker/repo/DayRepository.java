@@ -24,4 +24,9 @@ public interface DayRepository extends JpaRepository<Day, Long> {
 
     @Query(value = "SELECT distinct d FROM Day d LEFT JOIN FETCH d.flights")
     Optional<List<Day>> findAllJoinFetchFlights();
+
+    Optional<Day> findDistinctFirstByOrderByDateDesc();
+
+    @Query(value = "SELECT d.date FROM Day d ORDER BY d.date")
+    List<LocalDate> findAllDates();
 }

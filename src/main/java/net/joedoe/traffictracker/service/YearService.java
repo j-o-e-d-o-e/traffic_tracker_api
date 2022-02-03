@@ -26,6 +26,11 @@ public class YearService {
         if (!year.isPresent() || year.get().isEmpty()) {
             throw new NotFoundException("Could not find year " + date.getYear());
         }
-        return YearMapper.toDto(date, year.get());
+        return YearMapper.toDto(date, year.get(), hasNeighbour(date.minusYears(1)), hasNeighbour(date.plusYears(1)));
+    }
+
+    private boolean hasNeighbour(LocalDate date) {
+        Optional<List<Day>> year = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1));
+        return year.isPresent() && !year.get().isEmpty();
     }
 }

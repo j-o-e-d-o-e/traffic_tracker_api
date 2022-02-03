@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 public class MonthAssemblerTest {
     private final MonthAssembler assembler = new MonthAssembler();
     private final LocalDate startDate = LocalDate.now().withDayOfMonth(1);
-    private final MonthDto month = MonthMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1));
+    private final MonthDto month = MonthMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1), true, true);
 
     @Test
     public void toModel() {

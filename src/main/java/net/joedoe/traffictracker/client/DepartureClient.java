@@ -116,11 +116,15 @@ public class DepartureClient {
 
     @Setter
     public static class Departure {
-        String icao24; // "3c0c9d"
+        String icao24; // "3c0c9d" -> "3C0C9D"
         long firstSeen; // 1599410857
         String estDepartureAirport; // "LCLK"
         long lastSeen; // 1599424531
         String estArrivalAirport; // "EDDL"
+
+        public void setIcao24(String icao24) {
+            this.icao24 = icao24.toUpperCase();
+        }
 
         @Override
         public String toString() {

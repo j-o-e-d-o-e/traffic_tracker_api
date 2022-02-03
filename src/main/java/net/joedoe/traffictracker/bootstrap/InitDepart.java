@@ -5,7 +5,6 @@ import net.joedoe.traffictracker.client.DepartureClient;
 import net.joedoe.traffictracker.service.DayService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -27,13 +26,14 @@ public class InitDepart implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        updateDepartures(LocalDate.of(2021, 5, 17));
+        // date of day whose departures to be updated, e.g. yesterday
+        updateDepartures(LocalDate.of(2022, 1, 1));
     }
 
     /**
      * only if api-call to opensky failed for departures
      *
-     * @param date only for last seven days: day to be updated, e.g. yesterday
+     * @param date only for last seven days
      */
     private void updateDepartures(LocalDate date) {
         long end = Timestamp.valueOf(LocalDateTime.of(date.plusDays(1), LocalTime.MIDNIGHT)).getTime() / 1000;

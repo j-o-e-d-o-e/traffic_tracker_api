@@ -43,7 +43,7 @@ public class MonthControllerTest {
     public void getCurrentMonth() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days));
+        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days, true, true));
 
         mockMvc.perform(get("/api/months/current")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -56,7 +56,7 @@ public class MonthControllerTest {
     public void getMonthByDate() throws Exception {
         int total = days.stream().mapToInt(Day::getTotal).sum();
 
-        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days));
+        when(service.getMonth(date)).thenReturn(MonthMapper.toDto(date, days, true, true));
 
         System.out.println("/api/months/" + date.getYear() + "/" + date.getMonthValue());
         mockMvc.perform(get("/api/months/" + date.getYear() + "/" + date.getMonthValue())

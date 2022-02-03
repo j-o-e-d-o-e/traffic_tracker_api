@@ -12,7 +12,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class WindClient {
         }
     }
 
-    @Scheduled(cron = "0 30 6-23 * * *", zone = "${timezone}")
+//    @Scheduled(cron = "0 30 6-23 * * *", zone = "${timezone}")
     public void fetchWeather() {
         try {
             Response response = new OkHttpClient().newCall(new Request.Builder().url(url).build()).execute();
