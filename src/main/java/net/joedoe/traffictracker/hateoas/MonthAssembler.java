@@ -1,11 +1,10 @@
 package net.joedoe.traffictracker.hateoas;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nonnull;
 import net.joedoe.traffictracker.controller.MonthController;
 import net.joedoe.traffictracker.controller.WeekController;
 import net.joedoe.traffictracker.controller.YearController;
 import net.joedoe.traffictracker.dto.MonthDto;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -15,13 +14,11 @@ import java.time.LocalDate;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Slf4j
 @Component
 public class MonthAssembler implements RepresentationModelAssembler<MonthDto, EntityModel<MonthDto>> {
-
-    @NotNull
+    @Nonnull
     @Override
-    public EntityModel<MonthDto> toModel(@NotNull MonthDto month) {
+    public EntityModel<MonthDto> toModel(@Nonnull MonthDto month) {
         EntityModel<MonthDto> model = EntityModel.of(month);
         model.add(linkTo(methodOn(MonthController.class).getMonthByDate(month.getYear(), month.getMonth())).withSelfRel());
         if (month.isPrev()) {

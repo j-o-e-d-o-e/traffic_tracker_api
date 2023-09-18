@@ -3,40 +3,35 @@ package net.joedoe.traffictracker.service;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.bootstrap.FlightsInitTest;
 import net.joedoe.traffictracker.dto.DayDto;
-import net.joedoe.traffictracker.dto.WindDto;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.model.Flight;
 import net.joedoe.traffictracker.repo.DayRepository;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class DayServiceTest {
-    @InjectMocks
-    private DayService service;
     @Mock
     private DayRepository repository;
     @Mock
     private PlaneService planeService;
     @Mock
     private AirlineService airlineService;
+    @InjectMocks
+    private DayService service;
     private final LocalDate date = LocalDate.now();
     private final LocalDateTime dateTime = LocalDateTime.now();
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void addFlight() {
@@ -49,18 +44,6 @@ public class DayServiceTest {
         service.addFlight(flight.getPlane().getIcao(), flight);
 
         verify(repository, times(1)).findByDateJoinFetchFlights(any());
-        verify(repository, times(1)).save(any());
-    }
-
-    @Test
-    public void addWind() {
-        WindDto windDto = new WindDto();
-        windDto.setDateTime(dateTime);
-
-        when(repository.findByDate(date)).thenReturn(Optional.of(new Day()));
-        service.addWind(windDto);
-
-        verify(repository, times(1)).findByDate(any());
         verify(repository, times(1)).save(any());
     }
 

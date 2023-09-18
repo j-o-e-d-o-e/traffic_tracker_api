@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -jar target/traffic-tracker-2.0.1.jar

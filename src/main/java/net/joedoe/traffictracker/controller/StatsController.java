@@ -1,6 +1,5 @@
 package net.joedoe.traffictracker.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.StatsDto;
 import net.joedoe.traffictracker.service.StatsService;
 import org.springframework.http.CacheControl;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/stats")
 public class StatsController {

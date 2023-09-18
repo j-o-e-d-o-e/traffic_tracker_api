@@ -1,6 +1,5 @@
 package net.joedoe.traffictracker.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.hateoas.YearAssembler;
 import net.joedoe.traffictracker.service.YearService;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/years")
 public class YearController {
@@ -28,14 +26,14 @@ public class YearController {
     }
 
     @GetMapping("/current")
-    public EntityModel<?> getCurrentYear() {
-        YearDto yearDto = service.getYear(LocalDate.now().withDayOfMonth(1).withMonth(1));
+    public EntityModel<?> getYearLatest() {
+        YearDto yearDto = service.getYearLatest();
         return assembler.toModel(yearDto);
     }
 
     @GetMapping("/{year}")
     public ResponseEntity<?> getYearByDate(@PathVariable("year") Integer year) {
-        YearDto yearDto = service.getYear(LocalDate.of(year, 1, 1));
+        YearDto yearDto = service.getYearByDate(LocalDate.of(year, 1, 1));
         EntityModel<YearDto> model = assembler.toModel(yearDto);
         if (year < LocalDate.now().getYear()) {
             return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);

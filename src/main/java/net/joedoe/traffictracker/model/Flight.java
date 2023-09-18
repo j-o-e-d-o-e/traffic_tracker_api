@@ -1,11 +1,11 @@
 package net.joedoe.traffictracker.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,6 +33,12 @@ public class Flight {
     @ManyToOne(fetch = FetchType.EAGER)
     private Airline airline;
     @ToString.Exclude
-//    @Lob
-    private Byte[] photo;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Photo photo;
+    private boolean photoExists;
+
+    public void setPhoto(byte[] bytes) {
+        photo = new Photo(bytes);
+        photoExists = true;
+    }
 }

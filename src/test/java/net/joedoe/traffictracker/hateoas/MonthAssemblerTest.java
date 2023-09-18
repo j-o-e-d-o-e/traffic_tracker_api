@@ -4,19 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.MonthDto;
 import net.joedoe.traffictracker.mapper.MonthMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Slf4j
 public class MonthAssemblerTest {
     private final MonthAssembler assembler = new MonthAssembler();
     private final LocalDate startDate = LocalDate.now().withDayOfMonth(1);
-    private final MonthDto month = MonthMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1), true, true);
+    private final MonthDto month = MonthMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1), true, false);
 
     @Test
     public void toModel() {

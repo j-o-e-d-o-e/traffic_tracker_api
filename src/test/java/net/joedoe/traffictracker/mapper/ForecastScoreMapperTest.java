@@ -3,17 +3,12 @@ package net.joedoe.traffictracker.mapper;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.ForecastScoreDto;
 import net.joedoe.traffictracker.model.ForecastScore;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 public class ForecastScoreMapperTest {
-
-    @Before
-    public void setUp() {
-    }
 
     @Test
     public void toResource() {
@@ -25,7 +20,6 @@ public class ForecastScoreMapperTest {
         exp = Math.round(exp * 100) / 100f;
 
         ForecastScoreDto act = ForecastScoreMapper.toResource(score);
-//        log.info(String.valueOf(act));
 
         assertEquals(exp, act.getRecall(), 0.01f);
     }

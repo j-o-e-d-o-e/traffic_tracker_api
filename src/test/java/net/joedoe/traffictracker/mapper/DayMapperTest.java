@@ -4,12 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.DayDto;
 import net.joedoe.traffictracker.model.Day;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @Slf4j
 public class DayMapperTest {
@@ -27,7 +28,6 @@ public class DayMapperTest {
         assertEquals(day.getWindSpeed(), dayDto.getWind_speed(), 0.01f);
         assertEquals( LocalDateTime.now().getHour() + 1, dayDto.getHours_flight().length);
         assertEquals(LocalDateTime.now().getHour() + 1, dayDto.getHours_wind().length);
-//        log.info(String.valueOf(dayDto.getDepartures()));
     }
 
 

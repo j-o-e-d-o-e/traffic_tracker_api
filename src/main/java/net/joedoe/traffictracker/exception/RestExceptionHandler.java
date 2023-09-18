@@ -9,8 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class NotFoundExceptionHandler extends ResponseEntityExceptionHandler {
-
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<Object> handleNotFoundException(Exception exception, WebRequest request) {
         return handleExceptionInternal(exception, exception.getMessage(),

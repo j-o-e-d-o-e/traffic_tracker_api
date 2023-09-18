@@ -1,31 +1,18 @@
 package net.joedoe.traffictracker.mapper;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nonnull;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.MonthDto;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.util.PropertiesHandler;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Slf4j
 @Component
 public class MonthMapper {
-    private static LocalDate date;
-
-    static {
-        try {
-            MonthMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties")
-                    .getProperty("start-date"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static final LocalDate date = LocalDate.of(2019, 9, 9);
 
     public static MonthDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         MonthDto monthDto = new MonthDto();
@@ -58,7 +45,7 @@ public class MonthMapper {
             if (day.isLessThanThirtyFlights())
                 absDaysWithLessThanThirtyFlights += 1;
             monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
-            if (day.getDeparturesTop().size() == 0) continue;
+            if (day.getDeparturesTop().isEmpty()) continue;
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         monthDto.setTotal(total);
@@ -77,7 +64,7 @@ public class MonthMapper {
         return monthDto;
     }
 
-    @NotNull
+    @Nonnull
     private static Integer[] getAvgFlights(LocalDate date, int daysSize, int total) {
         Integer[] avgFlights;
         // Sept 2019

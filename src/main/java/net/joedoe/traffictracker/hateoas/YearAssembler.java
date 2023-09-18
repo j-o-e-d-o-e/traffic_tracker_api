@@ -1,25 +1,21 @@
 package net.joedoe.traffictracker.hateoas;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nonnull;
 import net.joedoe.traffictracker.controller.MonthController;
 import net.joedoe.traffictracker.controller.YearController;
 import net.joedoe.traffictracker.dto.YearDto;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import java.time.LocalDate;
-
-@Slf4j
 @Component
 public class YearAssembler implements RepresentationModelAssembler<YearDto, EntityModel<YearDto>> {
-
-    @NotNull
+    @Nonnull
     @Override
-    public EntityModel<YearDto> toModel(@NotNull YearDto year) {
+    public EntityModel<YearDto> toModel(@Nonnull YearDto year) {
         EntityModel<YearDto> model = EntityModel.of(year);
         model.add(linkTo(methodOn(YearController.class).getYearByDate(year.getYear())).withSelfRel());
         if (year.isPrev())

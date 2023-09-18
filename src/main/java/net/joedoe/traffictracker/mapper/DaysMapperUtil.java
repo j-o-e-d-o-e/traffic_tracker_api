@@ -1,9 +1,9 @@
 package net.joedoe.traffictracker.mapper;
 
-import net.joedoe.traffictracker.dto.MapEntryDto;
+import jakarta.annotation.Nonnull;
 import net.joedoe.traffictracker.dto.DeparturesDto;
+import net.joedoe.traffictracker.dto.MapEntryDto;
 import net.joedoe.traffictracker.model.Day;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DaysMapperUtil {
-
     public static void incrementDepartures(Day day, DeparturesDto departures, Map<String, Integer> airports) {
         departures.setContinental_abs(departures.getContinental_abs() + day.getDeparturesContinentalAbs());
         departures.setInternational_abs(departures.getInternational_abs() + day.getDeparturesInternationalAbs());
@@ -44,7 +43,7 @@ public class DaysMapperUtil {
         return departures;
     }
 
-    @NotNull
+    @Nonnull
     public static List<MapEntryDto> mapToList(Map<String, Integer> departures, int limit) {
         return departures.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).limit(limit)

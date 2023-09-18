@@ -3,11 +3,11 @@ package net.joedoe.traffictracker.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalTime;
 
 @Data
@@ -24,4 +24,9 @@ public class ForecastHour {
     int windDegree;
     @Column
     float probability;
+
+    public ForecastHour(LocalTime time, int windDegree) {
+        this.time = time;
+        this.windDegree = windDegree;
+    }
 }

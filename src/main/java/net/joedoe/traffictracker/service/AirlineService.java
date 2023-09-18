@@ -1,9 +1,8 @@
 package net.joedoe.traffictracker.service;
 
-import graphql.GraphQLException;
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
+import net.joedoe.traffictracker.exception.NotFoundException;
 import net.joedoe.traffictracker.mapper.PageMapper;
 import net.joedoe.traffictracker.model.Airline;
 import net.joedoe.traffictracker.repo.AirlineRepository;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class AirlineService {
     private final AirlineRepository repository;
@@ -32,17 +30,13 @@ public class AirlineService {
 
     public Airline findByIcao(String icao) {
         Optional<Airline> airline = repository.findByIcao(icao);
-        if (!airline.isPresent()) {
-            throw new GraphQLException("Could not find airline with icao " + icao);
-        }
+        if (airline.isEmpty()) throw new NotFoundException("Could not find airline with icao " + icao);
         return airline.get();
     }
 
     public PageDto<Airline> findAll(PageRequestDto req) {
         Optional<Page<Airline>> airlines = repository.findAllWithPagination(PageRequest.of(req.getPage(), req.getSize()));
-        if (!airlines.isPresent()) {
-            throw new GraphQLException("Could not find airlines");
-        }
+        if (airlines.isEmpty()) throw new NotFoundException("Could not find airlines");
         return pageMapper.toDto(airlines.get());
     }
 }

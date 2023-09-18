@@ -1,7 +1,8 @@
 package net.joedoe.traffictracker.service;
 
-import graphql.GraphQLException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.client.DepartureClient;
 import net.joedoe.traffictracker.dto.FlightDto;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
@@ -10,22 +11,23 @@ import net.joedoe.traffictracker.mapper.FlightMapper;
 import net.joedoe.traffictracker.mapper.PageMapper;
 import net.joedoe.traffictracker.model.Airport;
 import net.joedoe.traffictracker.model.Flight;
+import net.joedoe.traffictracker.model.Photo;
 import net.joedoe.traffictracker.repo.FlightRepository;
-import net.joedoe.traffictracker.util.PropertiesHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
+import java.util.TimeZone;
 
 @Slf4j
 @Service
@@ -33,17 +35,34 @@ public class FlightService {
     private final FlightRepository repository;
     private final AirportService airportService;
     private final PageMapper<Flight> pageMapper = new PageMapper<>();
-    private int flightsSavedInDays;
+    private final int flightsSavedInDays = 7;
+    private final String timezone;
 
-    public FlightService(FlightRepository repository, AirportService airportService) {
+    public FlightService(FlightRepository repository, AirportService airportService, @Value("${locale.timezone}") String timezone) {
         this.repository = repository;
         this.airportService = airportService;
-        try {
-            Properties prop = PropertiesHandler.getProperties("src/main/resources/flights-db.properties");
-            this.flightsSavedInDays = Integer.parseInt(prop.getProperty("flights.saved.in.days"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.timezone = timezone;
+    }
+
+
+    public void setDepartures(List<DepartureClient.Departure> departures, LocalDate date) {
+        log.info("Total fetched from api: " + departures.size());
+        List<Flight> flights = getFlightsByDate(date);
+        log.info("Total fetched from db: " + flights.size());
+        for (DepartureClient.Departure departure : departures) {
+            if (departure.estDepartureAirport == null) continue;
+            LocalDateTime lastSeen = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(departure.lastSeen * 1000),
+                    TimeZone.getTimeZone(timezone).toZoneId());
+            Optional<Flight> flight = flights.stream().filter(f ->
+                    (f.getDeparture() == null || f.getDeparture().getIcao() == null) &&
+                            (f.getPlane() != null && f.getPlane().getIcao() != null) &&
+                            departure.icao24.equals(f.getPlane().getIcao()) &&
+                            lastSeen.isBefore(f.getDateTime().plusMinutes(30)) &&
+                            lastSeen.isAfter(f.getDateTime().minusMinutes(30))).findFirst();
+            flight.ifPresent(f -> setDeparture(departure.estDepartureAirport, f));
         }
+        log.info("Departures saved.");
     }
 
     public void setDeparture(String icaoAirport, Flight flight) {
@@ -52,99 +71,83 @@ public class FlightService {
         repository.save(flight);
     }
 
-    public List<Flight> getByDate(LocalDate date) {
+    public List<Flight> getFlightsByDate(LocalDate date) {
         LocalDateTime time = LocalDateTime.of(date.minusDays(1), LocalTime.of(23, 59, 59));
         return repository.getFlightsByDateTimeBetweenOrderByDateTimeDesc(time, time.plusDays(1)).orElse(null);
     }
 
     @Transactional
-    public void delete(){
+    public void delete() {
         repository.deleteByDateTimeIsBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(flightsSavedInDays + 1));
     }
 
     // Rest
 
-    public Page<FlightDto> getByDate(LocalDate date, Pageable pageable) {
-        if (date.isBefore(LocalDate.now().minusDays(flightsSavedInDays))) {
+    public Page<FlightDto> getFlightsForLatestDay(Pageable pageable) {
+        Optional<Flight> latest = repository.findDistinctFirstByOrderByDateTimeDesc();
+        if (latest.isEmpty()) throw new NotFoundException("No flights found");
+        LocalDateTime end = latest.get().getDateTime().plusMinutes(1);
+        LocalDateTime start = LocalDateTime.of(LocalDate.of(end.getYear(), end.getMonth(), end.getDayOfMonth()).minusDays(1), LocalTime.of(23, 59, 59));
+        Optional<Page<Flight>> page = repository.getFlightsByDateTimeBetweenOrderByDateTimeDesc(start, end, pageable);
+        if (page.isEmpty()) throw new NotFoundException("Could not find latest flights for date");
+        return page.get().map(FlightMapper::toDto);
+    }
+
+    public Page<FlightDto> getFlightsByDate(LocalDate date, Pageable pageable) {
+        if (date.isBefore(LocalDate.now().minusDays(flightsSavedInDays)))
             throw new NotFoundException("Only flights for the last " + flightsSavedInDays + " days");
-        }
         LocalDateTime time = LocalDateTime.of(date.minusDays(1), LocalTime.of(23, 59, 59));
         Optional<Page<Flight>> page = repository.getFlightsByDateTimeBetweenOrderByDateTimeDesc(time, time.plusDays(1), pageable);
-        if (!page.isPresent()) {
-            throw new NotFoundException("Could not find flights for date " + date);
-        }
+        if (page.isEmpty()) throw new NotFoundException("Could not find flights for date " + date);
         return page.get().map(FlightMapper::toDto);
     }
 
     public Page<FlightDto> getByPlaneIcao(String icao, Pageable pageable) {
         Optional<Page<Flight>> page = repository.findByPlaneIcao(icao, pageable);
-        if (!page.isPresent()) {
-            throw new NotFoundException("Could not find flights by plane with icao " + icao);
-        }
+        if (page.isEmpty()) throw new NotFoundException("Could not find flights by plane with icao " + icao);
         return page.get().map(FlightMapper::toDto);
     }
 
     public void savePhoto(Long id, MultipartFile file) throws IOException {
         Flight flight = repository.findById(id).orElse(null);
-        if (flight == null) {
-            log.info("Could not find flight with id " + id);
-            throw new NotFoundException("Could not find flight with id " + id);
-        }
-        Byte[] bytes = new Byte[file.getBytes().length]; // hibernate prefers obj to primitives
-        int i = 0;
-        for (byte b : file.getBytes()) bytes[i++] = b;
-        flight.setPhoto(bytes);
+        if (flight == null) throw new NotFoundException("Could not find flight with id " + id);
+        flight.setPhoto(file.getBytes());
         repository.save(flight);
-        log.info("Photo added: " + flight);
+        log.info("Photo added for flight with id " + id);
     }
 
     public byte[] loadPhoto(Long id) {
-        Flight flight = repository.findById(id).orElse(null);
-        if (flight == null)
-            throw new NotFoundException("Could not find flight with id " + id);
-        if (flight.getPhoto() == null)
-            throw new NotFoundException("Could not find photo of flight with id " + id);
-        byte[] bytes = new byte[flight.getPhoto().length];
-        int i = 0;
-        for (Byte b : flight.getPhoto()) bytes[i++] = b; // auto unboxing
-        return bytes;
+        Photo photo = repository.findPhotoByFlightId(id).orElse(null);
+        if (photo == null) throw new NotFoundException("Could not find photo for flight with id " + id);
+        return photo.getArr();
     }
 
     // GraphQL
 
     public PageDto<Flight> findByAirlineIcao(String icao, PageRequestDto req) {
         Optional<Page<Flight>> flights = repository.findByAirlineIcao(icao, PageRequest.of(req.getPage(), req.getSize()));
-        if (!flights.isPresent()) {
-            throw new GraphQLException("Could not find flights by airline with icao " + icao);
-        }
+        if (flights.isEmpty()) throw new NotFoundException("Could not find flights by airline with icao " + icao);
         return pageMapper.toDto(flights.get());
     }
 
     public PageDto<Flight> findByAirportIcao(String icao, PageRequestDto req) {
         Optional<Page<Flight>> flights = repository.findByAirportIcao(icao, PageRequest.of(req.getPage(), req.getSize()));
-        if (!flights.isPresent()) {
-            throw new GraphQLException("Could not find flights from airport with icao " + icao);
-        }
+        if (flights.isEmpty()) throw new NotFoundException("Could not find flights from airport with icao " + icao);
         return pageMapper.toDto(flights.get());
     }
 
     public PageDto<Flight> findByPlaneIcao(String icao, PageRequestDto req) {
         Optional<Page<Flight>> flights = repository.findByPlaneIcao(icao, PageRequest.of(req.getPage(), req.getSize()));
-        if (!flights.isPresent()) {
-            throw new GraphQLException("Could not find flights by plane with icao " + icao);
-        }
+        if (flights.isEmpty()) throw new NotFoundException("Could not find flights by plane with icao " + icao);
         return pageMapper.toDto(flights.get());
     }
 
     public PageDto<Flight> findByDate(LocalDate date, PageRequestDto req) {
-        if (date.isBefore(LocalDate.now().minusDays(flightsSavedInDays))) {
-            throw new GraphQLException("Only flights for the last " + flightsSavedInDays + " days");
-        }
+        if (date.isBefore(LocalDate.of(2021, 9, 9).minusDays(flightsSavedInDays)))
+            throw new NotFoundException("Only flights for the last " + flightsSavedInDays + " days");
         LocalDateTime time = LocalDateTime.of(date.minusDays(1), LocalTime.of(23, 59, 59));
         Optional<Page<Flight>> flights = repository.getFlightsByDateTimeBetweenOrderByDateTimeDesc(time, time.plusDays(1), PageRequest.of(req.getPage(), req.getSize()));
-        if (!flights.isPresent()) {
-            throw new GraphQLException("Could not find flights for date " + date);
-        }
+        if (flights.isEmpty()) throw new NotFoundException("Could not find flights for date " + date);
         return pageMapper.toDto(flights.get());
     }
 }

@@ -1,8 +1,6 @@
 package net.joedoe.traffictracker.controller;
 
-import io.swagger.annotations.Api;
-import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.config.SwaggerConfig;
+import io.swagger.v3.oas.annotations.Hidden;
 import net.joedoe.traffictracker.dto.FlightDto;
 import net.joedoe.traffictracker.hateoas.FlightAssembler;
 import net.joedoe.traffictracker.repo.DeviceRepository;
@@ -18,14 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
-@Api(tags = {SwaggerConfig.FlightControllerTag})
 @RestController
 @RequestMapping("/api/flights")
 public class FlightController {
@@ -40,15 +35,14 @@ public class FlightController {
     }
 
     @GetMapping("/current")
-    public PagedModel<?> getFlightsForCurrentDay(Pageable pageable, PagedResourcesAssembler<FlightDto> pagedAssembler) {
-        Page<FlightDto> page = service.getByDate(LocalDate.now().minusDays(1), pageable);
+    public PagedModel<?> getFlightsForLatestDay(Pageable pageable, PagedResourcesAssembler<FlightDto> pagedAssembler) {
+        Page<FlightDto> page = service.getFlightsForLatestDay(pageable);
         return pagedAssembler.toModel(page, assembler);
     }
 
     @GetMapping(value = "/{date}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getFlightsByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                              Pageable pageable, PagedResourcesAssembler<FlightDto> pagedAssembler) {
-        Page<FlightDto> page = service.getByDate(date, pageable);
+    public ResponseEntity<?> getFlightsByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, Pageable pageable, PagedResourcesAssembler<FlightDto> pagedAssembler) {
+        Page<FlightDto> page = service.getFlightsByDate(date, pageable);
         PagedModel<?> model = pagedAssembler.toModel(page, assembler);
         if (date.isBefore(LocalDate.now())) {
             return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
@@ -56,11 +50,17 @@ public class FlightController {
         return ResponseEntity.ok().body(model);
     }
 
-    @ApiIgnore
+
+    @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getPhoto(@PathVariable Long id) {
+        byte[] media = service.loadPhoto(id);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(media);
+    }
+
+    @Hidden
     @PostMapping("/{id}/image")
-    public ResponseEntity<?> postPhotoById(@PathVariable Long id, @RequestHeader("Authorization") String auth,
-                                           @RequestBody() MultipartFile img) {
-        if (!auth.equals(deviceRepository.findByName("").getPw())) // enter device name
+    public ResponseEntity<?> postPhotoById(@PathVariable Long id, @RequestHeader("Authorization") String auth, @RequestBody() MultipartFile img) {
+        if (!auth.equals(deviceRepository.findByName("raspi").getPw()))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         try {
             service.savePhoto(id, img);
@@ -68,11 +68,5 @@ public class FlightController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<byte[]> getPhoto(@PathVariable Long id) {
-        byte[] media = service.loadPhoto(id);
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(media);
     }
 }

@@ -3,14 +3,15 @@ package net.joedoe.traffictracker.hateoas;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.mapper.WeekMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 public class WeekAssemblerTest {
     private final WeekAssembler assembler = new WeekAssembler();
@@ -18,7 +19,7 @@ public class WeekAssemblerTest {
 
     @Test
     public void toModel(){
-        WeekDto week = WeekMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1), true, true);
+        WeekDto week = WeekMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfWeek().getValue() - 1), true, false);
 
         EntityModel<WeekDto> weekDto = assembler.toModel(week);
 

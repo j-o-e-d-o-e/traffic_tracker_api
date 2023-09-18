@@ -3,17 +3,17 @@ package net.joedoe.traffictracker.mapper;
 import net.joedoe.traffictracker.bootstrap.ForecastsInitTest;
 import net.joedoe.traffictracker.dto.ForecastDayDto;
 import net.joedoe.traffictracker.model.ForecastDay;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ForecastMapperTest {
 
     @Test
     public void toResources() {
-        List<ForecastDay> days = ForecastsInitTest.createDays();
+        List<ForecastDay> days = ForecastsInitTest.createForecastDays();
         ForecastDay day = days.get(0);
 
         List<ForecastDayDto> dayDtos = ForecastMapper.toResources(days);

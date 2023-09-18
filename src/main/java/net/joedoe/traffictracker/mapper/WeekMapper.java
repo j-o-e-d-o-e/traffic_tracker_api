@@ -1,10 +1,10 @@
 package net.joedoe.traffictracker.mapper;
 
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.model.Day;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -14,7 +14,6 @@ import java.util.*;
 @Slf4j
 @Component
 public class WeekMapper {
-
     public static WeekDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         WeekDto weekDto = new WeekDto();
         weekDto.setStart_date(date);
@@ -38,7 +37,7 @@ public class WeekMapper {
             absAltitude += day.getAbsAltitude();
             absSpeed += day.getAbsSpeed();
             weekdays[day.getDate().getDayOfWeek().getValue() - 1] = day.getTotal();
-            if (day.getDeparturesTop().size() == 0) continue;
+            if (day.getDeparturesTop().isEmpty()) continue;
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         weekDto.setTotal(total);
@@ -55,7 +54,7 @@ public class WeekMapper {
         return weekDto;
     }
 
-    @NotNull
+    @Nonnull
     private static int[] getAvgFlights(LocalDate date, int daysSize, int total) {
         int[] avgFlights;
         if (LocalDate.now().isBefore(date.plusDays(7))) { // current week

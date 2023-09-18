@@ -2,20 +2,20 @@ package net.joedoe.traffictracker.config;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 import java.util.TimeZone;
 
-@PropertySource("classpath:locale.properties")
-@Component
+@PropertySource("classpath:application-config.properties")
+@Configuration
 public class LocaleConfig implements InitializingBean {
-    @Value("${timezone}")
+    @Value("${locale.timezone}")
     private String timezone;
-    @Value("${language}")
+    @Value("${locale.lang}")
     private String language;
-    @Value("${country}")
+    @Value("${locale.country}")
     private String country;
 
     @Override

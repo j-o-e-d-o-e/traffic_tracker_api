@@ -4,20 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.MonthDto;
 import net.joedoe.traffictracker.model.Day;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @Slf4j
 public class MonthMapperTest {
     private final LocalDate startDate = LocalDate.now().withDayOfMonth(1);
     private final List<Day> days = DaysInitTest.createDays(LocalDate.now().getDayOfMonth() - 1);
-
 
 
     @Test
@@ -36,12 +36,8 @@ public class MonthMapperTest {
         assertEquals((days.stream().filter(Day::isLessThanThirtyFlights).count()) / (float) days.size() * 100,
                 monthDto.getDays_with_less_than_thirty_flights(), 0.01f);
         int[] monthDays = new int[startDate.getMonth().length(startDate.isLeapYear())];
-        for (Day day : days) {
-            monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
-        }
-//        for (int i = 0; i < monthDays.length; i++) {
-//            log.info(i + ": " + monthDays[i] + " " + monthDto.getDays()[i]);
-//        }
+        for (Day day : days) monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
+
         assertArrayEquals(monthDays, monthDto.getDays());
         Integer[] avgFlights = new Integer[LocalDate.now().getDayOfMonth()];
         Arrays.fill(avgFlights, total / days.size());

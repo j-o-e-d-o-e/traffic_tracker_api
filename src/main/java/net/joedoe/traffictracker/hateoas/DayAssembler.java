@@ -1,11 +1,10 @@
 package net.joedoe.traffictracker.hateoas;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nonnull;
 import net.joedoe.traffictracker.controller.DayController;
 import net.joedoe.traffictracker.controller.FlightController;
 import net.joedoe.traffictracker.controller.WeekController;
 import net.joedoe.traffictracker.dto.DayDto;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -16,13 +15,11 @@ import java.time.LocalDate;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Slf4j
 @Component
 public class DayAssembler implements RepresentationModelAssembler<DayDto, EntityModel<DayDto>> {
-
-    @NotNull
+    @Nonnull
     @Override
-    public EntityModel<DayDto> toModel(@NotNull DayDto day) {
+    public EntityModel<DayDto> toModel(@Nonnull DayDto day) {
         LocalDate date = day.getDate();
         EntityModel<DayDto> model = EntityModel.of(day);
         model.add(linkTo(methodOn(DayController.class).getDayByDate(day.getDate())).withSelfRel());

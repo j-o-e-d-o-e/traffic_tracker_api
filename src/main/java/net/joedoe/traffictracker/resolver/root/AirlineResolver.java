@@ -1,32 +1,31 @@
 package net.joedoe.traffictracker.resolver.root;
 
-import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
 import net.joedoe.traffictracker.model.Airline;
 import net.joedoe.traffictracker.service.AirlineService;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-
-@Slf4j
-@Component
+@Controller
 @Validated
-public class AirlineResolver implements GraphQLQueryResolver {
+public class AirlineResolver {
     private final AirlineService service;
 
     public AirlineResolver(AirlineService service) {
         this.service = service;
     }
 
-    public Airline airline(String icao) {
+    @QueryMapping
+    public Airline airline(@Argument String icao) {
         return service.findByIcao(icao.toUpperCase());
     }
 
-    @SuppressWarnings("unused")
-    public PageDto<Airline> airlines(@Valid PageRequestDto req) {
+    @QueryMapping
+    public PageDto<Airline> airlines(@Argument @Valid PageRequestDto req) {
         if (req == null) req = new PageRequestDto(0, 10);
         return service.findAll(req);
     }

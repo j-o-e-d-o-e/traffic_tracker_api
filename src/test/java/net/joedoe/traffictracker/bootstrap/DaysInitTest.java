@@ -35,8 +35,6 @@ public class DaysInitTest {
         day.setHoursWind(new int[]{0, 0, 0, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
         day.setAbsAltitude(100000);
         day.setAbsSpeed(30000);
-        day.setAbsWind(19);
-        day.setAbsWindSpeed(200f);
         day.setDeparturesContinental(0.0f);
         day.setDeparturesInternational(0.54f);
         day.setDeparturesNational(0.29f);

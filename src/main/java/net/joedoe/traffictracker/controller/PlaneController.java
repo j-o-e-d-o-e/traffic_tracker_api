@@ -1,8 +1,5 @@
 package net.joedoe.traffictracker.controller;
 
-import io.swagger.annotations.Api;
-import lombok.extern.slf4j.Slf4j;
-import net.joedoe.traffictracker.config.SwaggerConfig;
 import net.joedoe.traffictracker.dto.FlightDto;
 import net.joedoe.traffictracker.hateoas.FlightAssembler;
 import net.joedoe.traffictracker.service.FlightService;
@@ -20,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
-@Api(tags = {SwaggerConfig.PlaneControllerTag})
 @RestController
 @RequestMapping("/api/planes")
 public class PlaneController {

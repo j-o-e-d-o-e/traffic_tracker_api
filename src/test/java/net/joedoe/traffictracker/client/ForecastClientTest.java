@@ -1,34 +1,31 @@
 package net.joedoe.traffictracker.client;
 
-import net.joedoe.traffictracker.repo.ForecastRepository;
-import net.joedoe.traffictracker.repo.ForecastScoreRepository;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.bootstrap.ForecastsInitTest;
+import net.joedoe.traffictracker.model.ForecastDay;
+import net.joedoe.traffictracker.model.ForecastScore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@Ignore("To avoid remote call to my heroku-django-api")
+import java.util.List;
+
+@Slf4j
+@Disabled("To avoid remote calls to weatherbit-api and my django-api")
+@SpringBootTest
 public class ForecastClientTest {
-    @Mock
-    private ForecastRepository repository;
-    @Mock
-    private ForecastScoreRepository scoreRepository;
+    @Autowired
     private ForecastClient client;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        client = new ForecastClient(repository, scoreRepository);
-    }
-
     @Test
-    public void predict() {
-        client.predict();
+    public void fetchForecasts() {
+        List<ForecastDay> forecasts = client.fetchForecasts();
+        forecasts.forEach(f -> log.info(f.toString()));
     }
-
     @Test
-    public void score() {
-        client.score();
+    public void fetchScores() {
+        ForecastScore score = client.fetchScores(ForecastsInitTest.createIntFlights(), ForecastsInitTest.createIntWinds());
+        log.info(score.toString());
     }
 }

@@ -1,28 +1,27 @@
 package net.joedoe.traffictracker.resolver.field;
 
-import graphql.kickstart.tools.GraphQLResolver;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
 import net.joedoe.traffictracker.model.Flight;
 import net.joedoe.traffictracker.model.Plane;
 import net.joedoe.traffictracker.service.FlightService;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-
-@Slf4j
-@Component
+@Controller
 @Validated
-public class PlaneFieldResolver implements GraphQLResolver<Plane> {
+public class PlaneFieldResolver {
     private final FlightService flightService;
 
     public PlaneFieldResolver(FlightService flightService) {
         this.flightService = flightService;
     }
 
-    public PageDto<Flight> flights(Plane plane, @Valid PageRequestDto req) {
+    @SchemaMapping
+    public PageDto<Flight> flights(Plane plane, @Argument @Valid PageRequestDto req) {
         if (req == null) req = new PageRequestDto(0, 10);
         return flightService.findByPlaneIcao(plane.getIcao(), req);
     }

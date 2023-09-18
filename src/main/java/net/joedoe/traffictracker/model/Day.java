@@ -1,19 +1,18 @@
 package net.joedoe.traffictracker.model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.joedoe.traffictracker.dto.WindDto;
-import org.springframework.context.annotation.PropertySource;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-@PropertySource({"classpath:departure.properties"})
 @Entity
 @NoArgsConstructor
 public class Day {
@@ -27,18 +26,20 @@ public class Day {
     private int flights0;
     private int avgAltitude;
     private int avgSpeed;
-    @SuppressWarnings("JpaAttributeTypeInspection")
+    @Basic
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     private int[] hoursFlight = new int[24];
     @ToString.Exclude
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "day", orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Flight> flights = new ArrayList<>();
     private float windSpeed;
-    @SuppressWarnings("JpaAttributeTypeInspection")
+    @Basic
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     private int[] hoursWind = new int[24];
     private int absAltitude;
     private int absSpeed;
-    private int absWind;
-    private float absWindSpeed;
+    private int absWind; // TODO: to be deleted
+    private float absWindSpeed;  // TODO: to be deleted
     private Float departuresContinental;
     private Float departuresInternational;
     private Float departuresNational;
@@ -77,13 +78,6 @@ public class Day {
         flights.add(flight);
     }
 
-    public void addWind(WindDto windDto) {
-        absWind += 1;
-        absWindSpeed += windDto.getSpeed();
-        windSpeed = Math.round(absWindSpeed / absWind * 100) / 100f;
-        hoursWind[windDto.getDateTime().getHour()] = windDto.getDeg();
-    }
-
     public void setDepartures() {
         departuresContinentalAbs = 0;
         departuresInternationalAbs = 0;
@@ -97,18 +91,10 @@ public class Day {
                 continue;
             }
             switch (departure.getRegion()) {
-                case INTERCONTINENTAL:
-                    departuresContinentalAbs++;
-                    break;
-                case INTERNATIONAL:
-                    departuresInternationalAbs++;
-                    break;
-                case NATIONAL:
-                    departuresNationalAbs++;
-                    break;
-                case UNKNOWN:
-                    departuresUnknownAbs++;
-                    break;
+                case INTERCONTINENTAL -> departuresContinentalAbs++;
+                case INTERNATIONAL -> departuresInternationalAbs++;
+                case NATIONAL -> departuresNationalAbs++;
+                case UNKNOWN -> departuresUnknownAbs++;
             }
             String departureName = departure.getName() != null ? departure.getName() : departure.getIcao();
             if (airportsOccurrences.containsKey(departureName))
@@ -129,7 +115,8 @@ public class Day {
                 .limit(5).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
-    public void clearFlights() {
-        this.flights.clear();
+    public void addWinds(WindDay windDay) {
+        hoursWind = windDay.getHoursWind();
+        windSpeed = windDay.getWindSpeed();
     }
 }

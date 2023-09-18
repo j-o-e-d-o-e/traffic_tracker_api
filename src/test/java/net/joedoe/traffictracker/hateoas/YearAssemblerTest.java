@@ -3,13 +3,13 @@ package net.joedoe.traffictracker.hateoas;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.mapper.YearMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
-import java.time.LocalDate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import java.time.LocalDate;
 
 public class YearAssemblerTest {
     private final YearAssembler assembler = new YearAssembler();
@@ -17,7 +17,7 @@ public class YearAssemblerTest {
 
     @Test
     public void toModel() {
-        YearDto year = YearMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfYear() - 1), true, true);
+        YearDto year = YearMapper.toDto(startDate, DaysInitTest.createDays(LocalDate.now().getDayOfYear() - 1), true, false);
 
         EntityModel<YearDto> yearDto = assembler.toModel(year);
 

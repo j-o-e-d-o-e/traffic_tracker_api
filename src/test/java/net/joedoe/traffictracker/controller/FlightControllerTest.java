@@ -1,21 +1,22 @@
 package net.joedoe.traffictracker.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.FlightsInitTest;
 import net.joedoe.traffictracker.dto.FlightDto;
-import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
+import net.joedoe.traffictracker.exception.RestExceptionHandler;
 import net.joedoe.traffictracker.hateoas.FlightAssembler;
 import net.joedoe.traffictracker.mapper.FlightMapper;
-import net.joedoe.traffictracker.repo.DeviceRepository;
 import net.joedoe.traffictracker.service.FlightService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -33,38 +34,49 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class FlightControllerTest {
+    @InjectMocks
+    FlightController controller;
     @Mock
     private FlightService service;
     @Mock
-    private DeviceRepository deviceRepository;
+    private FlightAssembler assembler;
     private MockMvc mockMvc;
-    private List<FlightDto> flights;
+    private final List<FlightDto> flights = FlightsInitTest.createFlights().stream().map(FlightMapper::toDto).collect(Collectors.toList());
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        FlightController controller = new FlightController(service, new FlightAssembler(), deviceRepository);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .setViewResolvers((viewName, locale) -> new MappingJackson2JsonView())
-                .setControllerAdvice(new NotFoundExceptionHandler())
+                .setControllerAdvice(new RestExceptionHandler())
                 .build();
-        flights = FlightsInitTest.createFlights().stream().map(FlightMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Test
+    public void getFlightsLatest() throws Exception {
+        Page<FlightDto> page = new PageImpl<>(flights, PageRequest.of(0, 20), 1);
+
+        when(service.getFlightsForLatestDay(any())).thenReturn(page);
+        for (FlightDto flight : flights) when(assembler.toModel(flight)).thenReturn(EntityModel.of(flight));
+
+
+        mockMvc.perform(get("/api/flights/current")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].icao_24", equalTo(flights.get(0).getIcao_24())));
     }
 
     @Test
     public void getFlightsByDate() throws Exception {
         Page<FlightDto> page = new PageImpl<>(flights, PageRequest.of(0, 20), 1);
 
-        when(service.getByDate(any(LocalDate.class), any())).thenReturn(page);
+        when(service.getFlightsByDate(any(LocalDate.class), any())).thenReturn(page);
+        for (FlightDto flight : flights) when(assembler.toModel(flight)).thenReturn(EntityModel.of(flight));
 
-        String date = DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusDays(1));
-        log.info(date);
-
-        mockMvc.perform(get("/api/flights/" + date)
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/flights/" + DateTimeFormatter.ISO_DATE.format(LocalDate.now().minusDays(1)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].icao_24", equalTo(flights.get(0).getIcao_24())));
     }

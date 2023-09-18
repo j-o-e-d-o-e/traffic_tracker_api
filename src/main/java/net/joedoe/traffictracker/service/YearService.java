@@ -1,6 +1,5 @@
 package net.joedoe.traffictracker.service;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.exception.NotFoundException;
 import net.joedoe.traffictracker.mapper.YearMapper;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class YearService {
     private final DayRepository repository;
@@ -21,11 +19,16 @@ public class YearService {
         this.repository = repository;
     }
 
-    public YearDto getYear(LocalDate date) {
+    public YearDto getYearLatest() {
+        Optional<Day> day = repository.findDistinctFirstByOrderByDateDesc();
+        if (day.isEmpty()) throw new NotFoundException("Could not find any month");
+        return getYearByDate(day.get().getDate().withMonth(1).withDayOfMonth(1));
+    }
+
+    public YearDto getYearByDate(LocalDate date) {
         Optional<List<Day>> year = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusYears(1));
-        if (!year.isPresent() || year.get().isEmpty()) {
+        if (year.isEmpty() || year.get().isEmpty())
             throw new NotFoundException("Could not find year " + date.getYear());
-        }
         return YearMapper.toDto(date, year.get(), hasNeighbour(date.minusYears(1)), hasNeighbour(date.plusYears(1)));
     }
 

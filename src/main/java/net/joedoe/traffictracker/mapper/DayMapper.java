@@ -1,14 +1,11 @@
 package net.joedoe.traffictracker.mapper;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.DayDto;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.MapEntryDto;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.util.PropertiesHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -17,20 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class DayMapper {
-    private static LocalDate date;
-    private static int flightsSavedInDays;
-
-    static {
-        try {
-            DayMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties").getProperty("start-date"));
-            DayMapper.flightsSavedInDays = Integer.parseInt(PropertiesHandler.getProperties("src/main/resources/flights-db.properties").getProperty("flights.saved.in.days"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static final LocalDate date = LocalDate.of(2019, 9, 9);
+    private static final int flightsSavedInDays = 7;
 
     public static DayDto toDto(Day day, boolean prev, boolean next) {
         DayDto dayDto = new DayDto();

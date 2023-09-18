@@ -1,9 +1,8 @@
 package net.joedoe.traffictracker.service;
 
-import graphql.GraphQLException;
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
+import net.joedoe.traffictracker.exception.NotFoundException;
 import net.joedoe.traffictracker.mapper.PageMapper;
 import net.joedoe.traffictracker.model.Plane;
 import net.joedoe.traffictracker.repo.PlaneRepository;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class PlaneService {
     private final PlaneRepository repository;
@@ -37,17 +35,13 @@ public class PlaneService {
 
     public Plane findByIcao(String icao) {
         Optional<Plane> plane = repository.findByIcao(icao);
-        if (!plane.isPresent()) {
-            throw new GraphQLException("Could not find plane with icao " + icao);
-        }
+        if (plane.isEmpty()) throw new NotFoundException("Could not find plane with icao " + icao);
         return plane.get();
     }
 
     public PageDto<Plane> findAll(PageRequestDto req) {
         Optional<Page<Plane>> planes = repository.findAllWithPagination(PageRequest.of(req.getPage(), req.getSize()));
-        if (!planes.isPresent()) {
-            throw new GraphQLException("Could not find planes");
-        }
+        if (planes.isEmpty()) throw new NotFoundException("Could not find planes");
         return pageMapper.toDto(planes.get());
     }
 }

@@ -1,6 +1,5 @@
 package net.joedoe.traffictracker.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.WeekDto;
 import net.joedoe.traffictracker.hateoas.WeekAssembler;
 import net.joedoe.traffictracker.service.WeekService;
@@ -17,7 +16,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/weeks")
 public class WeekController {
@@ -30,15 +28,15 @@ public class WeekController {
     }
 
     @GetMapping("/current")
-    public EntityModel<?> getCurrentWeek() {
-        WeekDto week = service.getWeek(LocalDate.now().with(DayOfWeek.MONDAY));
+    public EntityModel<?> getWeekLatest() {
+        WeekDto week = service.getWeekLatest();
         return assembler.toModel(week);
     }
 
     @GetMapping("/{date}")
     public ResponseEntity<?> getWeekByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         date = date.with(DayOfWeek.MONDAY);
-        WeekDto week = service.getWeek(date);
+        WeekDto week = service.getWeekByDate(date);
         EntityModel<WeekDto> model = assembler.toModel(week);
         if (date.isBefore(LocalDate.now().with(DayOfWeek.MONDAY))) {
             return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);

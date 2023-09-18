@@ -1,26 +1,22 @@
 package net.joedoe.traffictracker.client;
 
-import net.joedoe.traffictracker.service.DayService;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import lombok.extern.slf4j.Slf4j;
+import net.joedoe.traffictracker.dto.WindDto;
+import org.junit.jupiter.api.Disabled;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
 
-@Ignore("To avoid remote call to weather-api")
+@Slf4j
+@Disabled("To avoid remote call to weatherbit-api")
+@SpringBootTest
 public class WindClientTest {
-    @Mock
-    private DayService service;
+    @Autowired
     private WindClient client;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        client = new WindClient(service);
-    }
 
     @Test
     public void fetchWeather() {
-        client.fetchWeather();
+        WindDto windDto = client.fetchWind();
+        log.info(windDto.toString());
     }
 }

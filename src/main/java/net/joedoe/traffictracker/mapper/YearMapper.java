@@ -1,14 +1,12 @@
 package net.joedoe.traffictracker.mapper;
 
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.DeparturesDto;
 import net.joedoe.traffictracker.dto.YearDto;
 import net.joedoe.traffictracker.model.Day;
-import net.joedoe.traffictracker.util.PropertiesHandler;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -19,16 +17,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class YearMapper {
-    private static LocalDate date;
-
-    static {
-        try {
-            YearMapper.date = LocalDate.parse(PropertiesHandler.getProperties("src/main/resources/start-date.properties")
-                    .getProperty("start-date"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static final LocalDate date = LocalDate.of(2019, 9, 9);
 
     public static YearDto toDto(LocalDate date, List<Day> days, boolean prev, boolean next) {
         YearDto yearDto = new YearDto();
@@ -57,7 +46,7 @@ public class YearMapper {
             if (day.isLessThanThirtyFlights())
                 absDaysWithLessThanThirtyFlights += 1;
             months[day.getDate().getMonthValue() - 1] += day.getTotal();
-            if (day.getDeparturesTop().size() == 0) continue;
+            if (day.getDeparturesTop().isEmpty()) continue;
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         yearDto.setTotal(total);
@@ -76,7 +65,7 @@ public class YearMapper {
         return yearDto;
     }
 
-    @NotNull
+    @Nonnull
     private static Integer[] getAvgFlights(LocalDate date, int[] months, int total) {
         Integer[] avgFlights;
         int avgFlightsVal = (int) (total / Arrays.stream(months).filter(m -> m != 0).count());

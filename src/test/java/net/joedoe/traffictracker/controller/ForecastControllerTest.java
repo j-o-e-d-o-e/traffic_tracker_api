@@ -1,16 +1,16 @@
 package net.joedoe.traffictracker.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.ForecastsInitTest;
-import net.joedoe.traffictracker.exception.NotFoundExceptionHandler;
+import net.joedoe.traffictracker.exception.RestExceptionHandler;
 import net.joedoe.traffictracker.model.ForecastDay;
 import net.joedoe.traffictracker.model.ForecastScore;
-import net.joedoe.traffictracker.service.ForecastScoreService;
 import net.joedoe.traffictracker.service.ForecastService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,30 +24,28 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class ForecastControllerTest {
+    @InjectMocks
+    private ForecastController controller;
     @Mock
     private ForecastService service;
-    @Mock
-    private ForecastScoreService scoreService;
     private MockMvc mockMvc;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        ForecastController controller = new ForecastController(service, scoreService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new NotFoundExceptionHandler()).build();
+                .setControllerAdvice(new RestExceptionHandler()).build();
     }
 
     @Test
     public void getAll() throws Exception {
-        List<ForecastDay> days = ForecastsInitTest.createDays();
+        List<ForecastDay> days = ForecastsInitTest.createForecastDays();
 
-        when(service.findAll()).thenReturn(days);
+        when(service.getForecasts()).thenReturn(days);
+
         mockMvc.perform(get("/api/forecasts")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].probability", closeTo(days.get(0).getProbability(), 0.1f)))
                 .andExpect(jsonPath("$[0].hours", hasSize(6)));
@@ -57,9 +55,10 @@ public class ForecastControllerTest {
     public void getScore() throws Exception {
         ForecastScore score = ForecastsInitTest.createScore();
 
-        when(scoreService.find()).thenReturn(score);
+        when(service.getScore()).thenReturn(score);
+
         mockMvc.perform(get("/api/forecasts/score")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.precision", closeTo(score.getPrecision(), 0.1f)))
                 .andExpect(jsonPath("$.mean_abs_error", closeTo(score.getMeanAbsoluteError(), 0.1f)));

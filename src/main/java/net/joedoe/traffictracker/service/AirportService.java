@@ -1,9 +1,9 @@
 package net.joedoe.traffictracker.service;
 
-import graphql.GraphQLException;
 import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.dto.PageDto;
 import net.joedoe.traffictracker.dto.PageRequestDto;
+import net.joedoe.traffictracker.exception.NotFoundException;
 import net.joedoe.traffictracker.mapper.PageMapper;
 import net.joedoe.traffictracker.model.Airport;
 import net.joedoe.traffictracker.model.Region;
@@ -34,25 +34,19 @@ public class AirportService {
 
     public Airport findByIcao(String icao) {
         Optional<Airport> airport = repository.findByIcao(icao);
-        if (!airport.isPresent()) {
-            throw new GraphQLException("Could not find airport with icao " + icao);
-        }
+        if (airport.isEmpty()) throw new NotFoundException("Could not find airport with icao " + icao);
         return airport.get();
     }
 
     public PageDto<Airport> findAll(PageRequestDto req) {
         Optional<Page<Airport>> airports = repository.findAllWithPagination(PageRequest.of(req.getPage(), req.getSize()));
-        if (!airports.isPresent()) {
-            throw new GraphQLException("Could not find airports");
-        }
+        if (airports.isEmpty()) throw new NotFoundException("Could not find airports");
         return pageMapper.toDto(airports.get());
     }
 
     public PageDto<Airport> findAllByRegion(Region region, PageRequestDto req) {
         Optional<Page<Airport>> airports = repository.findAllByRegion(region, PageRequest.of(req.getPage(), req.getSize()));
-        if (!airports.isPresent()) {
-            throw new GraphQLException("Could not find airports in region " + region);
-        }
+        if (airports.isEmpty()) throw new NotFoundException("Could not find airports in region " + region);
         return pageMapper.toDto(airports.get());
     }
 }

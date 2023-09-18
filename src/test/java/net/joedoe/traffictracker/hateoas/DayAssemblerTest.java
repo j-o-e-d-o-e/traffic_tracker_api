@@ -4,14 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.joedoe.traffictracker.bootstrap.DaysInitTest;
 import net.joedoe.traffictracker.dto.DayDto;
 import net.joedoe.traffictracker.mapper.DayMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.hateoas.EntityModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Slf4j
 public class DayAssemblerTest {

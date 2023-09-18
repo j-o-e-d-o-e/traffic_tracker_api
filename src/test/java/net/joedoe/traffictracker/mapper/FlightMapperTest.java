@@ -5,18 +5,19 @@ import net.joedoe.traffictracker.bootstrap.FlightsInitTest;
 import net.joedoe.traffictracker.dto.FlightDto;
 import net.joedoe.traffictracker.model.Day;
 import net.joedoe.traffictracker.model.Flight;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class FlightMapperTest {
-    private Flight flight;
+    private static Flight flight;
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         Day day = DaysInitTest.createDay(LocalDate.now());
         flight = FlightsInitTest.createFlight(day);
     }
