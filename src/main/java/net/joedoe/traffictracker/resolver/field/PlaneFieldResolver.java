@@ -23,6 +23,6 @@ public class PlaneFieldResolver {
     @SchemaMapping
     public PageDto<Flight> flights(Plane plane, @Argument @Valid PageRequestDto req) {
         if (req == null) req = new PageRequestDto(0, 10);
-        return flightService.findByPlaneIcao(plane.getIcao(), req);
+        return flightService.findByPlaneIcao(plane.getIcao().toUpperCase(), req);
     }
 }

@@ -27,7 +27,7 @@ public class WeekMapper {
         weekDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0;
-        int[] weekdays = new int[7];
+        Integer[] weekdays = new Integer[7];
         DeparturesDto departuresDto = new DeparturesDto();
         Map<String, Integer> departures = new HashMap<>();
         for (Day day : days) {
@@ -41,7 +41,7 @@ public class WeekMapper {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         weekDto.setTotal(total);
-        weekDto.setAvg_flights(getAvgFlights(date, days.size(), total));
+        weekDto.setAvg_flights(getAvgFlights(days.size(), total));
         weekDto.setFlights_23(flights23);
         weekDto.setFlights_0(flights0);
         if (total != 0) {
@@ -55,14 +55,9 @@ public class WeekMapper {
     }
 
     @Nonnull
-    private static int[] getAvgFlights(LocalDate date, int daysSize, int total) {
-        int[] avgFlights;
-        if (LocalDate.now().isBefore(date.plusDays(7))) { // current week
-            avgFlights = new int[LocalDate.now().getDayOfWeek().getValue()];
-        } else {
-            avgFlights = new int[7];
-        }
-        Arrays.fill(avgFlights, total / daysSize);
+    private static Integer[] getAvgFlights(int daysSize, int total) {
+        Integer[] avgFlights = new Integer[7];
+        Arrays.fill(avgFlights,0, daysSize, total / daysSize);
         return avgFlights;
     }
 }

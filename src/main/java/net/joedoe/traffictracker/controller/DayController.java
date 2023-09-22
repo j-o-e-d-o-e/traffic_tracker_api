@@ -35,17 +35,14 @@ public class DayController {
     public ResponseEntity<?> getDayLatest() {
         DayDto day = service.getDayLatest();
         EntityModel<DayDto> model = assembler.toModel(day);
-        return ResponseEntity.ok().body(model);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 
     @GetMapping("/{date}")
     public ResponseEntity<?> getDayByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         DayDto day = service.getDayByDate(date);
         EntityModel<DayDto> model = assembler.toModel(day);
-        if (date.isBefore(LocalDate.now())) {
-            return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
-        }
-        return ResponseEntity.ok().body(model);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 
     @GetMapping("")

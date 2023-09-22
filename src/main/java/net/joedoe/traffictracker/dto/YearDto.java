@@ -28,7 +28,7 @@ public class YearDto {
     private int avg_altitude;
     private int avg_speed;
     private float days_with_less_than_thirty_flights;
-    private int[] months;
+    private Integer[] months;
     private DeparturesDto departures;
     private List<MapEntryDto> airports;
 }

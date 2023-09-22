@@ -40,31 +40,14 @@ public class DayService {
         this.windService = windService;
     }
 
-    public void addFlight(String icao, Flight flight) {
-        Plane plane = planeService.findOrCreate(icao.toUpperCase());
-        flight.setPlane(plane);
-        Airline airline = airlineService.findOrCreate(flight.getCallsign().substring(0, 3));
-        flight.setAirline(airline);
-        Day currentDay = repository.findByDateJoinFetchFlights(flight.getDateTime().toLocalDate()).orElse(null);
-        if (currentDay != null) {
-            currentDay.addFlight(flight);
-            repository.save(currentDay);
-            log.info("New flight: " + flight);
-        }
-    }
-
     public List<FlightDto> addFlights(LocalDate date, List<FlightDto> flights) {
         if (flights.isEmpty()) log.info("Empty list");
         Day day = repository.findByDateJoinFetchFlights(date).orElse(null);
         if (day == null) {
             day = new Day(date);
-            WindDay windDay = windService.getDayByDate(date);
-            day.addWinds(windDay);
-            windService.deleteAll();
+            addWinds(day);
         }
         List<Flight> dayFlights = day.getFlights();
-        log.info("Total of " + day.getDate() + ": " + day.getTotal());
-        int count = 0;
         for (FlightDto flight : flights) {
             if (dayFlights != null && !dayFlights.isEmpty()) {
                 boolean exists = dayFlights.stream().anyMatch(f -> f.getCallsign().equals(flight.getCallsign()) && f.getDateTime().equals(flight.getDate_time()));
@@ -83,12 +66,16 @@ public class DayService {
                 newFlight.setAirline(airline);
             }
             day.addFlight(newFlight);
-            count++;
         }
-        log.info("Flights added: " + count);
-        log.info("Total of " + day.getDate() + ": " + day.getTotal());
         Day savedDay = repository.save(day);
+        log.info("Total of " + savedDay.getDate() + ": " + savedDay.getTotal());
         return savedDay.getFlights().stream().map(FlightMapper::toDto).collect(Collectors.toList());
+    }
+
+    private void addWinds(Day day) {
+        WindDay windDay = windService.getDayByDate(day.getDate());
+        day.addWinds(windDay);
+        windService.deleteAll();
     }
 
     // At 30 minutes past the hour, between 06:00 AM and 11:59 PM
@@ -98,15 +85,14 @@ public class DayService {
         windService.fetchWind();
     }
 
-    // At 09:15 AM
-    @Scheduled(cron = "0 15 9 * * *", zone = "${locale.timezone}")
+    // At 09:00 AM
+    @Scheduled(cron = "0 0 9 * * *", zone = "${locale.timezone}")
     public void fetchDepartures() {
         List<DepartureClient.Departure> departures = departureClient.fetchDepartures();
         if (departures == null) return;
-        LocalDate date = LocalDate.now().minusDays(1);
+        LocalDate date = LocalDate.now().minusDays(6);
         flightService.setDepartures(departures, date);
         setDepartures(date);
-        log.info("Departures fetched");
     }
 
     // At 06:30 AM
@@ -119,11 +105,10 @@ public class DayService {
 
     public void setDepartures(LocalDate date) {
         Day day = repository.findByDateJoinFetchFlights(date).orElse(null);
-        if (day != null && !day.getFlights().isEmpty()) {
-            day.setDepartures();
-            repository.save(day);
-            log.info("Departures set for day " + date);
-        }
+        if (day == null || day.getFlights().isEmpty()) return;
+        day.setDepartures();
+        repository.save(day);
+        log.info("Departures set for day " + date);
     }
 
     public List<Day> findAllJoinFetchFlights() {

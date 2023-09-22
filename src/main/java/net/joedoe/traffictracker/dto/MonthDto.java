@@ -30,7 +30,7 @@ public class MonthDto {
     private int avg_altitude;
     private int avg_speed;
     private float days_with_less_than_thirty_flights;
-    private int[] days;
+    private Integer[] days;
     private DeparturesDto departures;
     private List<MapEntryDto> airports;
 }

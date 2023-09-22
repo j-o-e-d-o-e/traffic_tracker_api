@@ -27,13 +27,12 @@ public class MonthMapper {
         monthDto.setMonth(date.getMonthValue());
         if (date.getYear() == MonthMapper.date.getYear() && date.getMonth() == MonthMapper.date.getMonth())
             monthDto.setFirst_day_of_month(MonthMapper.date);
-        else
-            monthDto.setFirst_day_of_month(date);
+        else monthDto.setFirst_day_of_month(date);
         monthDto.setPrev(prev);
         monthDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0, absDaysWithLessThanThirtyFlights = 0;
-        int[] monthDays = new int[daysOfMonth];
+        Integer[] monthDays = new Integer[daysOfMonth];
         DeparturesDto departuresDto = new DeparturesDto();
         Map<String, Integer> departures = new HashMap<>();
         for (Day day : days) {
@@ -49,7 +48,7 @@ public class MonthMapper {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         monthDto.setTotal(total);
-        monthDto.setAvg_flights(getAvgFlights(date, days.size(), total));
+        monthDto.setAvg_flights(getAvgFlights(days, total));
         monthDto.setFlights_23(flights23);
         monthDto.setFlights_0(flights0);
         if (total != 0) {
@@ -65,22 +64,11 @@ public class MonthMapper {
     }
 
     @Nonnull
-    private static Integer[] getAvgFlights(LocalDate date, int daysSize, int total) {
-        Integer[] avgFlights;
-        // Sept 2019
-        if (date.getYear() == MonthMapper.date.getYear() && date.getMonth().equals(MonthMapper.date.getMonth())) {
-            avgFlights = new Integer[MonthMapper.date.getMonth().length(MonthMapper.date.isLeapYear())];
-            Arrays.fill(avgFlights, 0, MonthMapper.date.getDayOfMonth() - 1, null);
-            Arrays.fill(avgFlights, MonthMapper.date.getDayOfMonth() - 1, avgFlights.length, total / daysSize);
-        } else {
-            LocalDate now = LocalDate.now();
-            if (now.getYear() == date.getYear() && now.getMonth().equals(date.getMonth())) { // current month
-                avgFlights = new Integer[LocalDate.now().getDayOfMonth()];
-            } else { // earlier month (but not Sept 2019)
-                avgFlights = new Integer[date.getMonth().length(date.isLeapYear())];
-            }
-            Arrays.fill(avgFlights, total / daysSize);
-        }
+    private static Integer[] getAvgFlights(List<Day> days, int total) {
+        LocalDate date = days.get(0).getDate();
+        Integer[] avgFlights = new Integer[date.getMonth().length(date.isLeapYear())];
+        int avg = total / days.size();
+        for (Day day : days) avgFlights[day.getDate().getDayOfMonth() - 1] = avg;
         return avgFlights;
     }
 }

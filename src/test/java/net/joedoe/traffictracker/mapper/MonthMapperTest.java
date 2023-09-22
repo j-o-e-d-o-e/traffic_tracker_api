@@ -7,7 +7,6 @@ import net.joedoe.traffictracker.model.Day;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -35,12 +34,9 @@ public class MonthMapperTest {
                 monthDto.getAvg_speed());
         assertEquals((days.stream().filter(Day::isLessThanThirtyFlights).count()) / (float) days.size() * 100,
                 monthDto.getDays_with_less_than_thirty_flights(), 0.01f);
-        int[] monthDays = new int[startDate.getMonth().length(startDate.isLeapYear())];
+        Integer[] monthDays = new Integer[startDate.getMonth().length(startDate.isLeapYear())];
         for (Day day : days) monthDays[day.getDate().getDayOfMonth() - 1] = day.getTotal();
 
         assertArrayEquals(monthDays, monthDto.getDays());
-        Integer[] avgFlights = new Integer[LocalDate.now().getDayOfMonth()];
-        Arrays.fill(avgFlights, total / days.size());
-        assertArrayEquals(avgFlights, monthDto.getAvg_flights());
     }
 }

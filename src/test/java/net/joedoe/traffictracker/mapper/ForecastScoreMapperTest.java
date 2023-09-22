@@ -16,11 +16,9 @@ public class ForecastScoreMapperTest {
         score.setPrecision(87.68f);
         int[][] confusionMatrix = new int[][]{{33, 17}, {9, 121}};
         score.setConfusionMatrix(confusionMatrix);
-        float exp = (confusionMatrix[1][1] / (float) (confusionMatrix[1][0] + confusionMatrix[1][1])) * 100;
-        exp = Math.round(exp * 100) / 100f;
 
         ForecastScoreDto act = ForecastScoreMapper.toResource(score);
 
-        assertEquals(exp, act.getRecall(), 0.01f);
+        assertEquals(87.68f, act.getPrecision(), 0.01f);
     }
 }

@@ -23,12 +23,12 @@ public class WeekDto {
     private boolean prev;
     private boolean next;
     private int total;
-    private int[] avg_flights;
+    private Integer[] avg_flights;
     private int flights_23;
     private int flights_0;
     private int avg_altitude;
     private int avg_speed;
-    private int[] weekdays;
+    private Integer[] weekdays;
     private DeparturesDto departures;
     private List<MapEntryDto> airports;
 }

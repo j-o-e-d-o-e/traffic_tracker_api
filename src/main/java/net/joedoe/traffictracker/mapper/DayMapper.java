@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class DayMapper {
-    private static final LocalDate date = LocalDate.of(2019, 9, 9);
     private static final int flightsSavedInDays = 7;
 
     public static DayDto toDto(Day day, boolean prev, boolean next) {
@@ -33,65 +32,27 @@ public class DayMapper {
         dayDto.setAvg_speed(day.getAvgSpeed());
         dayDto.setLess_than_thirty_flights(day.isLessThanThirtyFlights());
         dayDto.setWind_speed(day.getWindSpeed());
-        dayDto.setHours_flight(getHoursFlight(day));
+        dayDto.setHours_flight(day.getHoursFlight());
         dayDto.setHours_wind(getHoursWind(day));
         dayDto.setDepartures(getDepartures(day));
         dayDto.setAirports(getAirportDtos(day));
-        dayDto.setFlights(day.getTotal() > 0 && day.getDate().isAfter(LocalDate.now().minusDays(flightsSavedInDays)));
+        dayDto.setFlights(day.getTotal() > 0 && day.getDate().isAfter(LocalDate.now().minusDays(flightsSavedInDays + 1)));
         return dayDto;
     }
 
     private static Integer[] getAvgFlights(Day day) {
         int absFlightsDay = day.getTotal() - day.getFlights23() - day.getFlights0();
-        Integer[] avgFlights;
-        if (LocalDate.now().isEqual(date)) {
-            int currentHour = LocalDateTime.now().getHour();
-            avgFlights = new Integer[currentHour + 1];
-            if (currentHour <= 6) {
-                Arrays.fill(avgFlights, null);
-            } else {
-                Arrays.fill(avgFlights, 0, 6, null);
-                Arrays.fill(avgFlights, 6, avgFlights.length, absFlightsDay / (currentHour - 6));
-            }
-        } else {
-            avgFlights = new Integer[24];
-            Arrays.fill(avgFlights, 0, 6, null);
-            Arrays.fill(avgFlights, 6, avgFlights.length, absFlightsDay / 17);
-        }
+        Integer[] avgFlights = new Integer[24];
+        Arrays.fill(avgFlights, 0, 6, null);
+        Arrays.fill(avgFlights, 6, avgFlights.length - 1, absFlightsDay / 17);
+        avgFlights[avgFlights.length - 1] = null;
         return avgFlights;
     }
 
-    private static int[] getHoursFlight(Day day) {
-        int[] hours_flight;
-        if (LocalDate.now().isEqual(day.getDate())) {
-            int currentHour = LocalDateTime.now().getHour();
-            hours_flight = Arrays.copyOfRange(day.getHoursFlight(), 0, currentHour + 1);
-        } else {
-            hours_flight = day.getHoursFlight();
-        }
-        return hours_flight;
-    }
-
     private static Integer[] getHoursWind(Day day) {
-        Integer[] hoursWind;
-        if (LocalDate.now().isEqual(day.getDate())) {
-            int currentHour = LocalDateTime.now().getHour();
-            hoursWind = new Integer[currentHour + 1];
-            if (currentHour <= 6) {
-                Arrays.fill(hoursWind, null);
-            } else {
-                Arrays.fill(hoursWind, 0, 6, null);
-                for (int i = 6; i <= currentHour; i++) {
-                    hoursWind[i] = day.getHoursWind()[i];
-                }
-            }
-        } else {
-            hoursWind = new Integer[24];
-            Arrays.fill(hoursWind, 0, 6, null);
-            for (int i = 6; i < hoursWind.length; i++) {
-                hoursWind[i] = day.getHoursWind()[i];
-            }
-        }
+        Integer[] hoursWind = new Integer[24];
+        Arrays.fill(hoursWind, 0, 6, null);
+        for (int i = 6; i < hoursWind.length; i++) hoursWind[i] = day.getHoursWind()[i];
         return hoursWind;
     }
 

@@ -26,18 +26,16 @@ public class YearController {
     }
 
     @GetMapping("/current")
-    public EntityModel<?> getYearLatest() {
+    public ResponseEntity<?> getYearLatest() {
         YearDto yearDto = service.getYearLatest();
-        return assembler.toModel(yearDto);
+        EntityModel<YearDto> model = assembler.toModel(yearDto);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 
     @GetMapping("/{year}")
     public ResponseEntity<?> getYearByDate(@PathVariable("year") Integer year) {
         YearDto yearDto = service.getYearByDate(LocalDate.of(year, 1, 1));
         EntityModel<YearDto> model = assembler.toModel(yearDto);
-        if (year < LocalDate.now().getYear()) {
-            return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
-        }
-        return ResponseEntity.ok().body(model);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 }

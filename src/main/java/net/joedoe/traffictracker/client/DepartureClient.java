@@ -37,8 +37,9 @@ public class DepartureClient {
     public List<Departure> fetchDepartures() {
         HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
         urlBuilder.addQueryParameter("airport", arrivalAirport);
-        long now = (System.currentTimeMillis() / 1000);
+        long now = (System.currentTimeMillis() / 1000) + (2 * 60 * 60); // + offset for timezone
         long end = now - (now % (24 * 60 * 60)); // for midnight
+        end = end - ((24 * 60 * 60) * 5); // 5 days before
         long begin = end - (24 * 60 * 60); // one day before
         urlBuilder.addQueryParameter("begin", String.valueOf(begin));
         urlBuilder.addQueryParameter("end", String.valueOf(end));
@@ -65,6 +66,11 @@ public class DepartureClient {
         public String estDepartureAirport; // "LCLK"
         public long lastSeen; // 1599424531
         String estArrivalAirport; // "EDDL"
+
+        @SuppressWarnings("unused")
+        public void setIcao24(String icao24) {
+            this.icao24 = icao24.toUpperCase();
+        }
 
         @Override
         public String toString() {

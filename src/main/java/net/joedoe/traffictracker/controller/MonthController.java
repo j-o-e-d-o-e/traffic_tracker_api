@@ -26,18 +26,16 @@ public class MonthController {
     }
 
     @GetMapping("/current")
-    public EntityModel<?> getMonthLatest() {
+    public ResponseEntity<?> getMonthLatest() {
         MonthDto monthDto = service.getMonthLatest();
-        return assembler.toModel(monthDto);
+        EntityModel<MonthDto> model = assembler.toModel(monthDto);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 
     @GetMapping("/{year}/{month}")
     public ResponseEntity<?> getMonthByDate(@PathVariable("year") Integer year, @PathVariable("month") Integer month) {
         MonthDto monthDto = service.getMonthByDate(LocalDate.of(year, month, 1));
         EntityModel<MonthDto> model = assembler.toModel(monthDto);
-        if (year < LocalDate.now().getYear() || month < LocalDate.now().getMonthValue()) {
-            return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
-        }
-        return ResponseEntity.ok().body(model);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 }

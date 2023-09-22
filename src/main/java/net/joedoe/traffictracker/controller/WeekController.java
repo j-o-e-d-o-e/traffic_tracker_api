@@ -28,19 +28,16 @@ public class WeekController {
     }
 
     @GetMapping("/current")
-    public EntityModel<?> getWeekLatest() {
+    public ResponseEntity<?> getWeekLatest() {
         WeekDto week = service.getWeekLatest();
-        return assembler.toModel(week);
+        EntityModel<WeekDto> model = assembler.toModel(week);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 
     @GetMapping("/{date}")
     public ResponseEntity<?> getWeekByDate(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        date = date.with(DayOfWeek.MONDAY);
-        WeekDto week = service.getWeekByDate(date);
+        WeekDto week = service.getWeekByDate(date.with(DayOfWeek.MONDAY));
         EntityModel<WeekDto> model = assembler.toModel(week);
-        if (date.isBefore(LocalDate.now().with(DayOfWeek.MONDAY))) {
-            return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
-        }
-        return ResponseEntity.ok().body(model);
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)).body(model);
     }
 }

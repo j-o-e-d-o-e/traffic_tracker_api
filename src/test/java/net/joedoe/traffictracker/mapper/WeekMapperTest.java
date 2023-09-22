@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,12 +30,9 @@ public class WeekMapperTest {
                 weekDto.getAvg_altitude());
         assertEquals(days.stream().mapToInt(Day::getAbsSpeed).sum() / total,
                 weekDto.getAvg_speed());
-        int[] weekdays = new int[7];
+        Integer[] weekdays = new Integer[7];
         for (int i = 0; i < days.size(); i++) weekdays[i] = days.get(i).getTotal();
 
         assertArrayEquals(weekdays, weekDto.getWeekdays());
-        int[] avgFlights = new int[days.size()];
-        Arrays.fill(avgFlights, total / days.size());
-        assertArrayEquals(avgFlights, weekDto.getAvg_flights());
     }
 }

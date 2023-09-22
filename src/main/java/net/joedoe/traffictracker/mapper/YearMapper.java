@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -34,7 +31,7 @@ public class YearMapper {
         yearDto.setNext(next);
 
         int total = 0, flights23 = 0, flights0 = 0, absAltitude = 0, absSpeed = 0, absDaysWithLessThanThirtyFlights = 0;
-        int[] months = new int[12];
+        Integer[] months = new Integer[12];
         DeparturesDto departuresDto = new DeparturesDto();
         Map<String, Integer> departures = new HashMap<>();
         for (Day day : days) {
@@ -43,14 +40,15 @@ public class YearMapper {
             flights0 += day.getFlights0();
             absAltitude += day.getAbsAltitude();
             absSpeed += day.getAbsSpeed();
-            if (day.isLessThanThirtyFlights())
-                absDaysWithLessThanThirtyFlights += 1;
-            months[day.getDate().getMonthValue() - 1] += day.getTotal();
+            if (day.isLessThanThirtyFlights()) absDaysWithLessThanThirtyFlights += 1;
+            int i = day.getDate().getMonthValue() - 1;
+            if (months[i] == null) months[i] = day.getTotal();
+            else months[i] += day.getTotal();
             if (day.getDeparturesTop().isEmpty()) continue;
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         yearDto.setTotal(total);
-        yearDto.setAvg_flights(getAvgFlights(date, months, total));
+        yearDto.setAvg_flights(getAvgFlights(months, total));
         yearDto.setFlights_23(flights23);
         yearDto.setFlights_0(flights0);
         if (total != 0) {
@@ -66,21 +64,10 @@ public class YearMapper {
     }
 
     @Nonnull
-    private static Integer[] getAvgFlights(LocalDate date, int[] months, int total) {
-        Integer[] avgFlights;
-        int avgFlightsVal = (int) (total / Arrays.stream(months).filter(m -> m != 0).count());
-        if (date.getYear() == YearMapper.date.getYear()) {
-            avgFlights = new Integer[12];
-            Arrays.fill(avgFlights, 0, YearMapper.date.getMonthValue() - 1, null);
-            Arrays.fill(avgFlights, YearMapper.date.getMonthValue() - 1, avgFlights.length, avgFlightsVal);
-        } else {
-            if (LocalDate.now().getYear() == date.getYear()) {
-                avgFlights = new Integer[LocalDate.now().getMonthValue()];
-            } else {
-                avgFlights = new Integer[12];
-            }
-            Arrays.fill(avgFlights, avgFlightsVal);
-        }
+    private static Integer[] getAvgFlights(Integer[] months, int total) {
+        Integer[] avgFlights = new Integer[12];
+        int avg = (int) (total / Arrays.stream(months).filter(Objects::nonNull).count());
+        for (int i = 0; i < months.length; i++) if (months[i] != null) avgFlights[i] = avg;
         return avgFlights;
     }
 }

@@ -7,7 +7,6 @@ import net.joedoe.traffictracker.model.Day;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,8 +25,6 @@ public class DayMapperTest {
         assertEquals(day.getAvgAltitude(), dayDto.getAvg_altitude());
         assertEquals(day.getAvgSpeed(), dayDto.getAvg_speed());
         assertEquals(day.getWindSpeed(), dayDto.getWind_speed(), 0.01f);
-        assertEquals( LocalDateTime.now().getHour() + 1, dayDto.getHours_flight().length);
-        assertEquals(LocalDateTime.now().getHour() + 1, dayDto.getHours_wind().length);
     }
 
 

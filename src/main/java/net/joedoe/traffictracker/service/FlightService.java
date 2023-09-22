@@ -25,9 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -48,21 +46,43 @@ public class FlightService {
     public void setDepartures(List<DepartureClient.Departure> departures, LocalDate date) {
         log.info("Total fetched from api: " + departures.size());
         List<Flight> flights = getFlightsByDate(date);
+        ListIterator<Flight> flightIter = flights.listIterator(flights.size());
         log.info("Total fetched from db: " + flights.size());
+        if (!flightIter.hasPrevious()) return;
+        Flight flight = flightIter.previous();
+        int count = 0;
+        departures.sort(Comparator.comparing(d -> d.lastSeen));
         for (DepartureClient.Departure departure : departures) {
-            if (departure.estDepartureAirport == null) continue;
+            if (!(flight.getDeparture() == null || flight.getDeparture().getIcao() == null)
+                    || flight.getPlane() == null || flight.getPlane().getIcao() == null) {
+                if (flightIter.hasPrevious()) {
+                    flight = flightIter.previous();
+                    continue;
+                } else break;
+            }
             LocalDateTime lastSeen = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(departure.lastSeen * 1000),
                     TimeZone.getTimeZone(timezone).toZoneId());
-            Optional<Flight> flight = flights.stream().filter(f ->
-                    (f.getDeparture() == null || f.getDeparture().getIcao() == null) &&
-                            (f.getPlane() != null && f.getPlane().getIcao() != null) &&
-                            departure.icao24.equals(f.getPlane().getIcao()) &&
-                            lastSeen.isBefore(f.getDateTime().plusMinutes(30)) &&
-                            lastSeen.isAfter(f.getDateTime().minusMinutes(30))).findFirst();
-            flight.ifPresent(f -> setDeparture(departure.estDepartureAirport, f));
+            if (lastSeen.isBefore(flight.getDateTime().minusMinutes(30))
+                    || !departure.icao24.equals(flight.getPlane().getIcao())) continue;
+            if (departure.estDepartureAirport == null) {
+                if (lastSeen.isBefore(flight.getDateTime())) continue;
+                if (flightIter.hasPrevious()) {
+                    flight = flightIter.previous();
+                    continue;
+                } else break;
+            }
+            count++;
+//            setDeparture(departure.estDepartureAirport, flight);
+            if (flightIter.hasPrevious()) flight = flightIter.previous();
+            else break;
         }
-        log.info("Departures saved.");
+        System.out.println(count);
+    }
+
+    private Flight getNext(ListIterator<Flight> iter) {
+        if (!iter.hasPrevious()) return null;
+        return iter.previous();
     }
 
     public void setDeparture(String icaoAirport, Flight flight) {
@@ -78,7 +98,7 @@ public class FlightService {
 
     @Transactional
     public void delete() {
-        repository.deleteByDateTimeIsBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(flightsSavedInDays + 1));
+        repository.deleteByDateTimeIsBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(flightsSavedInDays));
     }
 
     // Rest

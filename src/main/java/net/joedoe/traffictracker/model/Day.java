@@ -38,8 +38,6 @@ public class Day {
     private int[] hoursWind = new int[24];
     private int absAltitude;
     private int absSpeed;
-    private int absWind; // TODO: to be deleted
-    private float absWindSpeed;  // TODO: to be deleted
     private Float departuresContinental;
     private Float departuresInternational;
     private Float departuresNational;
