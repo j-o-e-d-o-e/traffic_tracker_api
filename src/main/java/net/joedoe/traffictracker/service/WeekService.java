@@ -29,7 +29,7 @@ public class WeekService {
     public WeekDto getWeekByDate(LocalDate date) {
         List<Day> week = repository.findAllByDateGreaterThanEqualAndDateLessThan(date, date.plusWeeks(1)).orElse(null);
         if (week == null || week.isEmpty()) {
-            throw new NotFoundException("Could not find week " + date + " to " + date.plusWeeks(1));
+            throw new NotFoundException("Could not find week " + date + " to " + date.plusDays(6));
         }
         return WeekMapper.toDto(date, week, hasNeighbour(date.minusWeeks(1)), hasNeighbour(date.plusWeeks(1)));
     }

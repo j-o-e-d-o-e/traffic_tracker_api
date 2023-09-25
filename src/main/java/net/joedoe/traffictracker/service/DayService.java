@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,11 +49,11 @@ public class DayService {
             addWinds(day);
         }
         List<Flight> dayFlights = day.getFlights();
+        if (dayFlights != null && !dayFlights.isEmpty()) {
+            log.info("Day " + date + " contains already " + dayFlights.size() + " flights");
+            return Collections.emptyList();
+        }
         for (FlightDto flight : flights) {
-            if (dayFlights != null && !dayFlights.isEmpty()) {
-                boolean exists = dayFlights.stream().anyMatch(f -> f.getCallsign().equals(flight.getCallsign()) && f.getDateTime().equals(flight.getDate_time()));
-                if (exists) continue;
-            }
             Flight newFlight = new Flight();
             if (flight.getCallsign().isEmpty()) newFlight.setCallsign("_NOCSGN");
             else newFlight.setCallsign(flight.getCallsign());
@@ -74,6 +75,7 @@ public class DayService {
 
     private void addWinds(Day day) {
         WindDay windDay = windService.getDayByDate(day.getDate());
+        if (windDay == null) return;
         day.addWinds(windDay);
         windService.deleteAll();
     }
@@ -91,8 +93,8 @@ public class DayService {
         List<DepartureClient.Departure> departures = departureClient.fetchDepartures();
         if (departures == null) return;
         LocalDate date = LocalDate.now().minusDays(6);
-        flightService.setDepartures(departures, date);
-        setDepartures(date);
+        boolean setDeparts = flightService.setDepartures(departures, date);
+        if (setDeparts) setDepartures(date);
     }
 
     // At 06:30 AM

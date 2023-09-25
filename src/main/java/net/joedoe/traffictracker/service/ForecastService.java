@@ -55,6 +55,7 @@ public class ForecastService {
         List<Integer> flights = new ArrayList<>();
         List<Integer> winds = new ArrayList<>();
         for (Day day : days) {
+            if (day.getDate().isBefore(LocalDate.of(2023, 9, 11))) continue; // TODO: tbd after 2023-10-11
             int[] f = day.getHoursFlight();
             int[] w = day.getHoursWind();
             for (int i = 6; i < 24; i += 3) {

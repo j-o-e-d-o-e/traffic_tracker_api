@@ -41,7 +41,7 @@ public class WeekMapper {
             DaysMapperUtil.incrementDepartures(day, departuresDto, departures);
         }
         weekDto.setTotal(total);
-        weekDto.setAvg_flights(getAvgFlights(days.size(), total));
+        weekDto.setAvg_flights(getAvgFlights(days, total));
         weekDto.setFlights_23(flights23);
         weekDto.setFlights_0(flights0);
         if (total != 0) {
@@ -55,9 +55,10 @@ public class WeekMapper {
     }
 
     @Nonnull
-    private static Integer[] getAvgFlights(int daysSize, int total) {
+    private static Integer[] getAvgFlights(List<Day> days, int total) {
         Integer[] avgFlights = new Integer[7];
-        Arrays.fill(avgFlights,0, daysSize, total / daysSize);
+        int avg = total / days.size();
+        for (Day day : days) avgFlights[day.getDate().getDayOfWeek().getValue() - 1] = avg;
         return avgFlights;
     }
 }

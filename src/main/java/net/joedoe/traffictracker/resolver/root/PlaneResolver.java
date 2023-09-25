@@ -21,7 +21,7 @@ public class PlaneResolver {
 
     @QueryMapping
     public Plane plane(@Argument String icao) {
-        return service.findByIcao(icao);
+        return service.findByIcao(icao.toUpperCase());
     }
 
     @QueryMapping

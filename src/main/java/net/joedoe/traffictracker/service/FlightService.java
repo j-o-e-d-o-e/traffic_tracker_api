@@ -43,47 +43,68 @@ public class FlightService {
     }
 
 
-    public void setDepartures(List<DepartureClient.Departure> departures, LocalDate date) {
-        log.info("Total fetched from api: " + departures.size());
+    public boolean setDepartures(List<DepartureClient.Departure> departures, LocalDate date) {
         List<Flight> flights = getFlightsByDate(date);
-        ListIterator<Flight> flightIter = flights.listIterator(flights.size());
+        log.info("Total fetched from api: " + departures.size());
         log.info("Total fetched from db: " + flights.size());
-        if (!flightIter.hasPrevious()) return;
-        Flight flight = flightIter.previous();
-        int count = 0;
-        departures.sort(Comparator.comparing(d -> d.lastSeen));
+        float departsPerFlight = departures.size() / (float) flights.size();
+        if (departsPerFlight < 0.5){
+            log.info("Not enough departures. Departures/flight: " + departsPerFlight);
+            return false;
+        }
         for (DepartureClient.Departure departure : departures) {
-            if (!(flight.getDeparture() == null || flight.getDeparture().getIcao() == null)
-                    || flight.getPlane() == null || flight.getPlane().getIcao() == null) {
-                if (flightIter.hasPrevious()) {
-                    flight = flightIter.previous();
-                    continue;
-                } else break;
-            }
+            if (departure.estDepartureAirport == null) continue;
             LocalDateTime lastSeen = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(departure.lastSeen * 1000),
                     TimeZone.getTimeZone(timezone).toZoneId());
-            if (lastSeen.isBefore(flight.getDateTime().minusMinutes(30))
-                    || !departure.icao24.equals(flight.getPlane().getIcao())) continue;
-            if (departure.estDepartureAirport == null) {
-                if (lastSeen.isBefore(flight.getDateTime())) continue;
-                if (flightIter.hasPrevious()) {
-                    flight = flightIter.previous();
-                    continue;
-                } else break;
+            for (Flight f : flights) {
+                if (!(f.getDeparture() == null || f.getDeparture().getIcao() == null)) continue;
+                if (f.getPlane() == null || f.getPlane().getIcao() == null) continue;
+                if (!departure.icao24.equals(f.getPlane().getIcao())) continue;
+                if (lastSeen.isBefore(f.getDateTime().plusMinutes(30)) && lastSeen.isAfter(f.getDateTime().minusMinutes(30))) {
+                    setDeparture(departure.estDepartureAirport, f);
+                }
             }
-            count++;
-//            setDeparture(departure.estDepartureAirport, flight);
-            if (flightIter.hasPrevious()) flight = flightIter.previous();
-            else break;
         }
-        System.out.println(count);
+        return true;
     }
 
-    private Flight getNext(ListIterator<Flight> iter) {
-        if (!iter.hasPrevious()) return null;
-        return iter.previous();
-    }
+//    public void setDepartures(List<DepartureClient.Departure> departures, LocalDate date) {
+//        log.info("Total fetched from api: " + departures.size());
+//        List<Flight> flights = getFlightsByDate(date);
+//        ListIterator<Flight> flightIter = flights.listIterator(flights.size());
+//        log.info("Total fetched from db: " + flights.size());
+//        if (!flightIter.hasPrevious()) return;
+//        Flight flight = flightIter.previous();
+//        int count = 0;
+//        departures.sort(Comparator.comparing(d -> d.lastSeen));
+//        for (DepartureClient.Departure departure : departures) {
+//            if (!(flight.getDeparture() == null || flight.getDeparture().getIcao() == null)
+//                    || flight.getPlane() == null || flight.getPlane().getIcao() == null) {
+//                if (flightIter.hasPrevious()) {
+//                    flight = flightIter.previous();
+//                    continue;
+//                } else break;
+//            }
+//            LocalDateTime lastSeen = LocalDateTime.ofInstant(
+//                    Instant.ofEpochMilli(departure.lastSeen * 1000),
+//                    TimeZone.getTimeZone(timezone).toZoneId());
+//            if (lastSeen.isBefore(flight.getDateTime().minusMinutes(30))
+//                    || !departure.icao24.equals(flight.getPlane().getIcao())) continue;
+//            if (departure.estDepartureAirport == null) {
+//                if (lastSeen.isBefore(flight.getDateTime())) continue;
+//                if (flightIter.hasPrevious()) {
+//                    flight = flightIter.previous();
+//                    continue;
+//                } else break;
+//            }
+//            count++;
+////            setDeparture(departure.estDepartureAirport, flight);
+//            if (flightIter.hasPrevious()) flight = flightIter.previous();
+//            else break;
+//        }
+//        System.out.println(count);
+//    }
 
     public void setDeparture(String icaoAirport, Flight flight) {
         Airport airport = airportService.findOrCreate(icaoAirport);
